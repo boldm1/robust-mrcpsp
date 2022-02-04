@@ -17,7 +17,9 @@ def load_mrcpsp(filepath):
 
     block = 0
     succ = {}  # dict of successors of each job
-    modes = {}  # dict with job indices as keys, list of Mode objects as values
+    M = {}  # dict of modes for each job
+    d = {}  # dict of duration for each job
+    r = {}  # dict of resource requirements for each job
     for line in raw_lines:
         ints = list(map(int, re.findall(r'\d+', line)))  # list of integers in line
         if len(ints) == 0:
@@ -35,26 +37,23 @@ def load_mrcpsp(filepath):
                 n_nonrenew = int(ints[0])  # number of non-renewable resources
         elif block == 4:
             jobnr = int(ints[0]) - 1  # jobs are numbered from 1 to n+2 in data files
+            M[jobnr] = int(ints[1])
             succ[jobnr] = [int(succ) - 1 for succ in ints[3:]]  # ints[3:] = successors
         elif block == 5:
             n_res = n_renew + n_nonrenew
             if len(ints) == 3 + n_res:  # mode 1 data
                 jobnr = int(ints[0]) - 1
-                d = int(ints[2])
-                r = [int(x) for x in ints[3:]]
-                mode = Mode(d, r)
-                modes[jobnr] = [mode]
+                d[jobnr] = [int(ints[2])]
+                r[jobnr] = [[int(x) for x in ints[3:]]]
             elif len(ints) == 2 + n_res:  # modes 2,3,4... data
-                d = int(ints[1])
-                r = [int(x) for x in ints[2:]]
-                mode = Mode(d, r)
-                modes[jobnr].append(mode)  # use jobnr from previous line
+                d[jobnr].append(int(ints[1]))
+                r[jobnr].append([int(x) for x in ints[2:]])
         if block == 6:
             R = [int(x) for x in ints]
     jobs = {}
     for j in range(n + 2):
         pred = [i for i in range(j) if j in succ[i]]
-        jobs[j] = Job(j, pred, succ[j], modes[j])
+        jobs[j] = Job(j, pred, succ[j], M[j], d[j], r[j])
     instance_name = os.path.basename(os.path.normpath(os.path.splitext(filepath)[0]))
     K_renew = [k for k in range(n_renew)]  # indices of renewables resources in R
     K_nonrenew = [k for k in range(n_renew, n_res)]  # indices of non-renewable resources in R
@@ -62,31 +61,12 @@ def load_mrcpsp(filepath):
     return instance
 
 
-class Mode:
-    """
-    Class representing a processing mode of a job in a Robust Multi-mode Resource Constrained Project Scheduling Problem
-    instance.
-    """
-
-    def __init__(self, d, r):
-        """
-        Initialises Mode with duration and resource requirements data.
-
-        :param d: Duration
-        :type d: int
-        :param r: List of requirement of each resource type
-        :type r: list
-        """
-        self.d = d
-        self.r = r
-
-
 class Job:
     """
     Class representing multi-mode job from Robust Multi-mode Resource Constrained Project Scheduling Problem instance.
     """
 
-    def __init__(self, idx, pred, succ, modes):
+    def __init__(self, idx, pred, succ, M, d, r):
         """
         Initialises Job with data.
 
@@ -96,15 +76,19 @@ class Job:
         :type pred: list
         :param succ: List of successors
         :type succ: list
-        :param modes: List of modes, ordered by non-decreasing duration
-        :type modes: list[Mode]
+        :param M: Activity processing modes, ordered by non-decreasing duration
+        :type M: list
+        :param d: Duration of each mode in M
+        :type d: list[int]
+        :param r: Requirement for each resource of each mode in M
+        :type r: list[list]
         """
         self.idx = idx
         self.pred = pred
         self.succ = succ
-        self.modes = modes
-
-        self.M = [m for m in range(len(self.modes))]  # list of modes
+        self.M = M
+        self.d = d
+        self.r = r
 
         # Earliest and latest start and finish times. Computed upon project creation.
         self.ES = None
@@ -160,7 +144,7 @@ class Instance:
         self.jobs[0].EF = 0
         for j in range(1, self.n + 2):
             self.jobs[j].ES = max(self.jobs[i].EF for i in self.jobs[j].pred)  # ES = max EF of predecessors
-            self.jobs[j].EF = self.jobs[j].ES + self.jobs[j].modes[0].d  # shortest duration
+            self.jobs[j].EF = self.jobs[j].ES + self.jobs[j].d[0]  # shortest duration
 
     def backward_pass(self):
         """
@@ -172,4 +156,4 @@ class Instance:
         self.jobs[n + 1].LS = self.T
         for j in range(n, -1, -1):
             self.jobs[j].LF = min(self.jobs[i].LS for i in self.jobs[j].succ)  # LF = min LS of all successors
-            self.jobs[j].LS = self.jobs[j].LF - self.jobs[j].modes[0].d  # shortest duration
+            self.jobs[j].LS = self.jobs[j].LF - self.jobs[j].d[0]  # shortest duration
