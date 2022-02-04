@@ -1,5 +1,6 @@
 import re
 import os
+import math
 
 
 def load_nominal_mrcpsp(filepath):
@@ -104,7 +105,8 @@ class NominalJob(Job):
     """
     Class representing job with certain duration from MRCPSP. Inherits parameters from Job class.
     """
-    def __init__(self,  idx, pred, succ, M, d, r):
+
+    def __init__(self, idx, pred, succ, M, d, r):
         """
         Initialises NominalJob with data.
 
@@ -184,3 +186,35 @@ class Instance:
         for j in range(n, -1, -1):
             self.jobs[j].LF = min(self.jobs[i].LS for i in self.jobs[j].succ)  # LF = min LS of all successors
             self.jobs[j].LS = self.jobs[j].LF - self.jobs[j].d[0]  # shortest duration
+
+    def set_dbar_explicitly(self, d_bar):
+        """
+        Function to explicitly set d_bar for each mode of jobs in Instance.
+
+        :param d_bar: Dict with maximal deviation from nominal duration of each mode for each job. d_bar must have
+            values for each mode of specified jobs.
+        :type d_bar: dict
+        """
+        # check d_bar contains value for each m in self.M for each job
+        to_fix = []
+        for j in self.V:
+            if len(d_bar[j]) != len(self.jobs[j].M):
+                to_fix.append(j)
+        # check to_fix is empty. If non-empty throw error.
+        if to_fix:
+            raise Exception("Values specified in d_bar for jobs {} does not match the number of modes for those jobs! "
+                            "Please correct this and try again.".format(str(to_fix)[1:-1]))
+
+        # set d_bar
+        for j in d_bar:
+            self.jobs[j].d_bar = d_bar[j]
+
+    def set_dbar_uncertainty_level(self, uncertainty_level):
+        """
+        Sets d_bar according to target uncertainty_level for each mode of each job.
+
+        :param uncertainty_level: Non-negative value representing desired ratio between d_bar[m] / d[m].
+        :type uncertainty_level: float
+        """
+        for j in self.V:
+            self.jobs[j].d_bar = [math.floor(uncertainty_level * self.jobs[j].d[m]) for m in self.jobs[j].M]
