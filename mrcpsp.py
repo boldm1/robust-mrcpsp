@@ -2,7 +2,7 @@ import re
 import os
 
 
-def load_mrcpsp(filepath):
+def load_nominal_mrcpsp(filepath):
     """
     Loads MRCPSP instance from data file and returns Instance object.
 
@@ -37,7 +37,7 @@ def load_mrcpsp(filepath):
                 n_nonrenew = int(ints[0])  # number of non-renewable resources
         elif block == 4:
             jobnr = int(ints[0]) - 1  # jobs are numbered from 1 to n+2 in data files
-            M[jobnr] = int(ints[1])
+            M[jobnr] = [m for m in range(int(ints[1]))]
             succ[jobnr] = [int(succ) - 1 for succ in ints[3:]]  # ints[3:] = successors
         elif block == 5:
             n_res = n_renew + n_nonrenew
@@ -53,7 +53,7 @@ def load_mrcpsp(filepath):
     jobs = {}
     for j in range(n + 2):
         pred = [i for i in range(j) if j in succ[i]]
-        jobs[j] = Job(j, pred, succ[j], M[j], d[j], r[j])
+        jobs[j] = NominalJob(j, pred, succ[j], M[j], d[j], r[j])
     instance_name = os.path.basename(os.path.normpath(os.path.splitext(filepath)[0]))
     K_renew = [k for k in range(n_renew)]  # indices of renewables resources in R
     K_nonrenew = [k for k in range(n_renew, n_res)]  # indices of non-renewable resources in R
@@ -66,7 +66,7 @@ class Job:
     Class representing multi-mode job from Robust Multi-mode Resource Constrained Project Scheduling Problem instance.
     """
 
-    def __init__(self, idx, pred, succ, M, d, r):
+    def __init__(self, idx, pred, succ, M, d, d_bar, r):
         """
         Initialises Job with data.
 
@@ -78,8 +78,10 @@ class Job:
         :type succ: list
         :param M: Activity processing modes, ordered by non-decreasing duration
         :type M: list
-        :param d: Duration of each mode in M
+        :param d: Nominal duration of each mode in M
         :type d: list[int]
+        :param d_bar: Maximal deviation from nominal duration, for each mode in M
+        :type d_bar: list[int]
         :param r: Requirement for each resource of each mode in M
         :type r: list[list]
         """
@@ -88,6 +90,7 @@ class Job:
         self.succ = succ
         self.M = M
         self.d = d
+        self.d_bar = d_bar
         self.r = r
 
         # Earliest and latest start and finish times. Computed upon project creation.
@@ -95,6 +98,30 @@ class Job:
         self.LS = None
         self.EF = None
         self.LF = None
+
+
+class NominalJob(Job):
+    """
+    Class representing job with certain duration from MRCPSP. Inherits parameters from Job class.
+    """
+    def __init__(self,  idx, pred, succ, M, d, r):
+        """
+        Initialises NominalJob with data.
+
+        :param idx: Job index
+        :type idx: int
+        :param pred: List of predecessors
+        :type pred: list
+        :param succ: List of successors
+        :type succ: list
+        :param M: Activity processing modes, ordered by non-decreasing duration
+        :type M: list
+        :param d: Nominal duration of each mode in M
+        :type d: list[int]
+        :param r: Requirement for each resource of each mode in M
+        :type r: list[list]
+        """
+        super().__init__(idx, pred, succ, M, d, [0 for _ in M], r)
 
 
 class Instance:

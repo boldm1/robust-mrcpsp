@@ -14,13 +14,11 @@ def compact_reformulation(instance, Gamma, time_limit):
     :rtype: Solution
     """
     # get instance data
-    d = [[instance.jobs[j].modes[m].d for m in instance.jobs[j].M] for j in
-         instance.V]  # d[j][m] = duration of j in mode m
-    d_bar = [[instance.jobs[j].modes[m].d_bar for m in instance.jobs[j].M] for j in
-             instance.V]  # d_bar[j][m] = max durational deviation of j in mode m
+    d = [instance.jobs[j].d for j in instance.V]  # d[j][m] = duration of j in mode m
+    d_bar = [instance.jobs[j].d_bar for j in instance.V]  # d_bar[j][m] = max durational deviation of j in mode m
     M = [instance.jobs[j].M for j in instance.V]  # M[j] = list of modes of j
     # r[j][m][k] = amount of resource k required by j in mode m. Dummy source and sink all available resource.
-    r = [[instance.R]] + [[instance.jobs[j].modes[m].r for m in M[j]] for j in instance.N] + [[instance.R]]
+    r = [instance.R] + [instance.jobs[j].r for j in instance.N] + [instance.R]
 
     # Create model
     model_name = '{}_compact_reformulation'.format(instance.name)
