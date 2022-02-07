@@ -2,7 +2,7 @@ import gurobipy as gp
 from gurobipy import GRB
 
 
-def compact_reformulation(instance, Gamma, time_limit, write_sol=False):
+def compact_reformulation(instance, Gamma, time_limit, write_sol=False, print_log=False):
     """
     Solves given robust MRCPSP instance using compact mixed-integer programming reformulation.
 
@@ -15,8 +15,10 @@ def compact_reformulation(instance, Gamma, time_limit, write_sol=False):
     :type time_limit: int
     :param write_sol: Indicates whether or not to write solution to output file. Defaults to False.
     :param write_sol: bool
-    :return: Objective value of solution
-    :rtype: float
+    :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
+    :type print_log: bool
+    :return: Objective value of solution and solve time
+    :rtype: tuple(float, float)
     """
     # get instance data
     d = [instance.jobs[j].d for j in instance.V]  # d[j][m] = duration of j in mode m
@@ -31,6 +33,7 @@ def compact_reformulation(instance, Gamma, time_limit, write_sol=False):
 
     # Set Gurobi parameters
     model.setParam('TimeLimit', time_limit)
+    model.setParam('OutputFlag', print_log)
 
     G = range(Gamma + 1)  # levels in auxiliary graph
 
@@ -71,9 +74,9 @@ def compact_reformulation(instance, Gamma, time_limit, write_sol=False):
         gp.quicksum(f[i, j, k] for i in instance.V) == gp.quicksum(r[j][m][k] * x[j, m] for m in M[j]) for j in
         instance.V if j != 0 for k in instance.K_renew)
     model.addConstrs(gp.quicksum(x[i, m] for m in M[i]) == 1 for i in instance.V)
-
     # Non-renewable resource constraints
-    model.addConstrs(gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) for i in instance.V for k in instance.K_nonrenew)
+    model.addConstrs(gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) <= instance.R[k] for i in instance.V for k in
+                     instance.K_nonrenew)
 
     # solve model
     model.optimize()
@@ -81,5 +84,4 @@ def compact_reformulation(instance, Gamma, time_limit, write_sol=False):
         model.write('{}.sol'.format(model_name))
 
     # return objective value of solution
-    return model.ObjVal
-
+    return model.ObjVal, model.Runtime

@@ -39,7 +39,7 @@ class Benders:
         self.sub_model = None
         self.sub_objval = None
 
-    def solve(self, time_limit, write_master=False):
+    def solve(self, time_limit, write_master=False, print_log=False):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
@@ -48,15 +48,21 @@ class Benders:
         :type time_limit: int
         :param write_master: Indicates whether or not to write solution of master model to output file each iteration.
             Defaults to False.
-        :param write_master: bool
-        :return: Objective value of solution.
-        :rtype: float
+        :type write_master: bool
+        :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
+        :type print_log: bool
+        :return: Dictionary containing objective value of solution, overall solve time, number of iterations.
+        :rtype: dict
         """
         # Benders' decomposition algorithm
         t = 0  # iteration number
         start_time = time.time()
-        self.create_master_problem()  # create basic master problem with no optimality cuts
+        self.create_master_problem(print_log)  # create basic master problem with no optimality cuts
         while self.LB < self.UB:
+            if print_log is True:
+                print("Iteration {}".format(t))
+                print("------------")
+                print("Solving master problem...")
             # solve master problem and update LB
             self.master_model.optimize()
             if write_master is True:
@@ -65,26 +71,36 @@ class Benders:
             if master_objval > self.LB:
                 self.LB = self.master_model.ObjVal
             # solve sub-problem and update UB
-            self.get_subproblem(t)
+            self.get_subproblem(t, print_log)
+            if print_log is True:
+                print("Solving sub-problem...")
             self.sub_model.optimize()
-            self.sub_objval = self.sub_model.optimize()
+            self.sub_objval = self.sub_model.ObjVal
             if self.sub_objval < self.UB:
                 self.UB = self.sub_objval
+            if print_log is True:
+                print("LB = {}, UB = {}".format(self.LB, self.UB))
+                print("-----------------------------------------------------------------------------\n")
             # check termination conditions
-            if self.LB >= self.UB:
-                return self.UB  # optimal solution
+            if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
+                solve_time = time.time() - start_time
+                return {'objval': self.UB, 'solve_time': solve_time, 'n_iterations': t}  # optimal solution
             elif time.time() - start_time > time_limit:
-                return self.UB  # time-limit reached
+                return {'objval': self.UB, 'solve_time': time_limit, 'n_iterations': t}  # time-limit reached
             # add cut and go to next iteration
             else:
                 self.add_cut(t)
                 t += 1
 
-    def create_master_problem(self):
+    def create_master_problem(self, print_log=False):
         """
         Creates Gurobi model to represent basic master problem without optimality cuts. The master problem selects job
         processing modes and resource allocations to minimise project duration under nominal job processing times. The
         solution to the master problem provides a LB to optimal robust solution.
+
+        :param print_log: Indicates whether or not to print Gurobi solve log to terminal when the model is solved.
+            Defaults to False.
+        :type print_log: bool
         """
         # get instance data
         V = self.instance.V
@@ -98,6 +114,7 @@ class Benders:
         # Create model
         model_name = '{}_benders_master'.format(self.instance.name)
         model = gp.Model(model_name)
+        model.setParam('OutputFlag', print_log)
 
         # Create variables
         eta = model.addVar(name="eta")  # variable to represent objective value
@@ -137,6 +154,9 @@ class Benders:
         model.addConstrs(
             gp.quicksum(f[i, j, k] for i in V if i != j if i != n + 1) == gp.quicksum(
                 r[j][m][k] * x[j, m] for m in M[j]) for j in V if j != 0 for k in self.instance.K_renew)
+        # Non-renewable resource constraints
+        model.addConstrs(gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) <= self.instance.R[k] for i in V for k in
+                         self.instance.K_nonrenew)
 
         # UB on min makespan, i.e. largest possible gap between s[j] and s[i].
         N = sum(max(d[i][m] + d_bar[i][m] for m in M[i]) for i in V)
@@ -146,16 +166,12 @@ class Benders:
         model.addConstr(eta >= s[n])
 
         # longest path with minimal job durations
-        model.addConstr(eta >= gp.quicksum(min(d[i][m] for m in M[i]) * phi[i][j] for i in V for j in V))
+        model.addConstr(eta >= gp.quicksum(min(d[i][m] for m in M[i]) * phi[i, j] for i in V for j in V))
         model.addConstrs(
-            gp.quicksum(phi[j][i] for j in V) == gp.quicksum(phi[i][j] for j in V) for i in V if i != 0 if i != n + 1)
-        model.addConstr(gp.quicksum(phi[0][j] for j in V) == 1)
-        model.addConstr(gp.quicksum(phi[j][n + 1] for j in V) == 1)
+            gp.quicksum(phi[j, i] for j in V) == gp.quicksum(phi[i, j] for j in V) for i in V if i != 0 if i != n + 1)
+        model.addConstr(gp.quicksum(phi[0, j] for j in V) == 1)
+        model.addConstr(gp.quicksum(phi[j, n + 1] for j in V) == 1)
         model.addConstrs(phi[i, j] <= y[i, j] for i in V for j in V if i != j)
-
-        # Non-renewable resource constraints
-        model.addConstrs(
-            gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) for i in V for k in self.instance.K_nonrenew)
 
         # update model and variable parameters
         self.master_model = model
@@ -181,7 +197,7 @@ class Benders:
         # get transitive network from master problem
         T_E = [(i, j) for i in V for j in V if self.master_y[i, j].X > 0.99]
         # get mode selection from master problem
-        master_M = [sum(m * self.master_x[i, m] for m in M) for i in V]
+        master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
 
         # some number larger than number of extra precedences in optimal master solution
         N = self.instance.n * self.instance.n
@@ -195,7 +211,7 @@ class Benders:
         # add cut to list of cuts
         self.cuts.append(cut)
 
-    def get_subproblem(self, t):
+    def get_subproblem(self, t, print_log=False):
         """
         Takes job processing modes and resource allocations selected by the master problem and builds model to find
         longest path through the project network, considering uncertain job durations. When solved, this model produces
@@ -203,6 +219,9 @@ class Benders:
 
         :param t: Iteration number
         :type t: int
+        :param print_log: Indicates whether or not to print Gurobi solve log to terminal when the model is solved.
+            Defaults to False.
+        :type print_log: bool
         """
         # get instance data
         V = self.instance.V
@@ -214,11 +233,12 @@ class Benders:
         # get transitive network from master problem
         T_E = [(i, j) for i in V for j in V if self.master_y[i, j].X > 0.99]
         # get mode selection from master problem
-        master_M = [sum(m * self.master_x[i, m] for m in M) for i in V]
+        master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
 
         # Create model
         model_name = '{}_benders_sub_{}'.format(self.instance.name, t)
         model = gp.Model(model_name)
+        model.setParam('OutputFlag', print_log)
 
         # Add variables to model
         alpha = model.addVars([(i, j) for i in V for j in V], name="alpha", vtype=GRB.BINARY)
@@ -226,8 +246,8 @@ class Benders:
         xi = model.addVars([i for i in V], name="xi", vtype=GRB.CONTINUOUS, lb=0, ub=1)
 
         # Add constraints to model
-        model.addConstrs(gp.quicksum(alpha[i, n + 1] for i in V if (i, n + 1) in T_E) == 1)
-        model.addConstrs(gp.quicksum(alpha[0, i] for i in V if (0, i) in T_E) == 1)
+        model.addConstr(gp.quicksum(alpha[i, n + 1] for i in V if (i, n + 1) in T_E) == 1)
+        model.addConstr(gp.quicksum(alpha[0, i] for i in V if (0, i) in T_E) == 1)
         model.addConstrs(gp.quicksum(alpha[e[0], e[1]] for e in T_E if e[0] == i) - gp.quicksum(
             alpha[e[0], e[1]] for e in T_E if e[1] == i) == 0 for i in V if i != 0 if i != n + 1)
         model.addConstrs(w[e[0], e[1]] <= xi[e[0]] for e in T_E)
@@ -237,7 +257,7 @@ class Benders:
         # set objective function
         model.setObjective(gp.quicksum(
             d[e[0]][master_M[e[0]]] * alpha[e[0], e[1]] + d_bar[e[0]][master_M[e[0]]] * w[e[0], e[1]] for e in T_E),
-                           GRB.MAXIMIZE)
+            GRB.MAXIMIZE)
 
         # update sub-problem model parameter
         self.sub_model = model
