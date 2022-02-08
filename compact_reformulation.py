@@ -84,4 +84,5 @@ def compact_reformulation(instance, Gamma, time_limit, print_log=False):
     T_E = [(i, j) for i in instance.V for j in instance.V if i != j if y[i, j].X > 0.99]
     flows = {(i, j): [f[i, j, k].X for k in instance.K_renew] for i in instance.V for j in instance.V if
              i != instance.n + 1 if j != 0 if i != j}
-    return {'objval': model.ObjVal, 'solve_time': model.Runtime, 'modes': modes, 'network': T_E, 'flows': flows}
+    return {'objval': model.ObjVal, 'objbound': model.ObjBound, 'runtime': model.Runtime, 'modes': modes,
+            'network': T_E, 'flows': flows}

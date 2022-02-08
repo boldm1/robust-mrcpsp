@@ -56,6 +56,7 @@ class Benders:
         """
         # Benders' decomposition algorithm
         t = 1  # iteration number
+        iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
         best_sol = {}  # dictionary to store x, y, f variable values of best solution
         start_time = time.time()
         self.create_master_problem(print_log)  # create basic master problem with no optimality cuts
@@ -64,6 +65,7 @@ class Benders:
                 print("Iteration {}".format(t))
                 print("------------")
                 print("Solving master problem...")
+            iteration_start = time.time()  # start timing iteration
             # solve master problem and update LB
             self.master_model.optimize()
             master_objval = self.master_model.ObjVal
@@ -91,17 +93,25 @@ class Benders:
             # check termination conditions
             if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
                 # optimal solution
-                solve_time = time.time() - start_time
-                return {'objval': self.UB, 'solve_time': solve_time, 'n_iterations': t, 'modes': best_sol['modes'],
-                        'network': best_sol['network'], 'flows': best_sol['flows']}
+                runtime = time.time() - start_time
+                iteration_times.append(time.time() - iteration_start)  # add final iteration time
+                average_iteration_time = sum(iteration_times) / t
+                return {'objval': self.UB, 'objbound': self.LB, 'runtime': runtime, 'n_iterations': t,
+                        'avg_iteration': average_iteration_time,
+                        'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
             elif time.time() - start_time > time_limit:
                 # time-limit reached
-                return {'objval': self.UB, 'solve_time': time_limit, 'n_iterations': t, 'modes': best_sol['modes'],
-                        'network': best_sol['network'], 'flows': best_sol['flows']}
+                iteration_times.append(time.time() - iteration_start)  # add final iteration time
+                average_iteration_time = sum(iteration_times) / t
+                return {'objval': self.UB, 'objbound': self.LB, 'runtime': time_limit, 'n_iterations': t,
+                        'avg_iteration': average_iteration_time,
+                        'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
             # add cut and go to next iteration
             else:
                 self.add_cut(t)
+                iteration_times.append(time.time() - iteration_start)
                 t += 1
+
 
     def create_master_problem(self, print_log=False):
         """
