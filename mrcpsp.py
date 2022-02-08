@@ -77,7 +77,7 @@ class Job:
         :type pred: list
         :param succ: List of successors
         :type succ: list
-        :param M: Activity processing modes, ordered by non-decreasing duration
+        :param M: Activity processing modes
         :type M: list
         :param d: Nominal duration of each mode in M
         :type d: list[int]
@@ -116,7 +116,7 @@ class NominalJob(Job):
         :type pred: list
         :param succ: List of successors
         :type succ: list
-        :param M: Activity processing modes, ordered by non-decreasing duration
+        :param M: Activity processing modes
         :type M: list
         :param d: Nominal duration of each mode in M
         :type d: list[int]

@@ -35,27 +35,28 @@ class Benders:
         self.master_f = None
         self.master_s = None
         self.master_phi = None
-        # Sub-problem model and objective value. Updated each time sub-problem is generated and solved.
+        # Sub-problem model, objective value and parameters. Updated each time sub-problem is generated and solved.
         self.sub_model = None
         self.sub_objval = None
+        self.sub_alpha = None
+        self.sub_w = None
+        self.sub_xi = None
 
-    def solve(self, time_limit, write_master=False, print_log=False):
+    def solve(self, time_limit, print_log=False):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
 
         :param time_limit: Max running time of algorithm in seconds. Current UB is returned if time_limit is reached.
         :type time_limit: int
-        :param write_master: Indicates whether or not to write solution of master model to output file each iteration.
-            Defaults to False.
-        :type write_master: bool
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
         :type print_log: bool
-        :return: Dictionary containing objective value of solution, overall solve time, number of iterations.
+        :return: Dictionary containing solution information.
         :rtype: dict
         """
         # Benders' decomposition algorithm
-        t = 0  # iteration number
+        t = 1  # iteration number
+        best_sol = {}  # dictionary to store x, y, f variable values of best solution
         start_time = time.time()
         self.create_master_problem(print_log)  # create basic master problem with no optimality cuts
         while self.LB < self.UB:
@@ -65,8 +66,6 @@ class Benders:
                 print("Solving master problem...")
             # solve master problem and update LB
             self.master_model.optimize()
-            if write_master is True:
-                self.master_model.write('{}_iter{}.sol'.format(self.master_model.ModelName, t))
             master_objval = self.master_model.ObjVal
             if master_objval > self.LB:
                 self.LB = self.master_model.ObjVal
@@ -78,15 +77,27 @@ class Benders:
             self.sub_objval = self.sub_model.ObjVal
             if self.sub_objval < self.UB:
                 self.UB = self.sub_objval
+                # get solution info and save to dict
+                modes = {i: int(sum(m * self.master_x[i, m].X for m in self.instance.jobs[i].M)) for i in
+                         self.instance.V}
+                T_E = [(i, j) for i in self.instance.V for j in self.instance.V if i != j if
+                       self.master_y[i, j].X > 0.99]
+                flows = {(i, j): [self.master_f[i, j, k].X for k in self.instance.K_renew] for i in self.instance.V for
+                         j in self.instance.V if i != self.instance.n + 1 if j != 0 if i != j}
+                best_sol = {'modes': modes, 'network': T_E, 'flows': flows}
             if print_log is True:
                 print("LB = {}, UB = {}".format(self.LB, self.UB))
                 print("-----------------------------------------------------------------------------\n")
             # check termination conditions
             if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
+                # optimal solution
                 solve_time = time.time() - start_time
-                return {'objval': self.UB, 'solve_time': solve_time, 'n_iterations': t}  # optimal solution
+                return {'objval': self.UB, 'solve_time': solve_time, 'n_iterations': t, 'modes': best_sol['modes'],
+                        'network': best_sol['network'], 'flows': best_sol['flows']}
             elif time.time() - start_time > time_limit:
-                return {'objval': self.UB, 'solve_time': time_limit, 'n_iterations': t}  # time-limit reached
+                # time-limit reached
+                return {'objval': self.UB, 'solve_time': time_limit, 'n_iterations': t, 'modes': best_sol['modes'],
+                        'network': best_sol['network'], 'flows': best_sol['flows']}
             # add cut and go to next iteration
             else:
                 self.add_cut(t)
@@ -118,12 +129,13 @@ class Benders:
 
         # Create variables
         eta = model.addVar(name="eta")  # variable to represent objective value
-        y = model.addVars([(i, j) for i in V for j in V], name="y",
+        y = model.addVars([(i, j) for i in V for j in V if i != j], name="y",
                           vtype=GRB.BINARY)  # y_ij = 1 if i -> j in transitive project precedence network
         x = model.addVars([(i, m) for i in V for m in M[i]], name="x",
                           vtype=GRB.BINARY)  # x_im = 1 if i is executed in mode m
-        f = model.addVars([(i, j, k) for i in V for j in V for k in self.instance.K_renew], name="f",
-                          vtype=GRB.CONTINUOUS, lb=0)  # f_ijk = flow from i to j of renewable resource k
+        f = model.addVars(
+            [(i, j, k) for i in V for j in V if i != j if i != n + 1 if j != 0 for k in self.instance.K_renew],
+            name="f", vtype=GRB.CONTINUOUS, lb=0)  # f_ijk = flow from i to j of renewable resource k
         s = model.addVars([i for i in V], name="s", vtype=GRB.INTEGER)  # start time of each job
         # longest path variables
         phi = model.addVars([(i, j) for i in V for j in V], name="phi", vtype=GRB.CONTINUOUS, lb=0)
@@ -145,15 +157,15 @@ class Benders:
             (1 - x[j, m_j]) * (
                     max(max(r[i][m][k] for m in M[i]), max(r[j][m][k] for m in M[j])) -
                     min(r[i][m_i][k], r[j][m_j][k])) for i in
-            V if i != n + 1
-            for j in V if j != 0 for m_i in M[i] for m_j in M[j] for k in self.instance.K_renew)
-        model.addConstrs(gp.quicksum(x[i, m] for m in M[i]) == 1 for i in V)
+            V if i != n + 1 for j in V if j != 0 if i != j for m_i in M[i] for m_j in M[j] for k in
+            self.instance.K_renew)
         model.addConstrs(
             gp.quicksum(f[i, j, k] for j in V if j != i if j != 0) == gp.quicksum(r[i][m][k] * x[i, m] for m in M[i])
             for i in V if i != n + 1 for k in self.instance.K_renew)
         model.addConstrs(
             gp.quicksum(f[i, j, k] for i in V if i != j if i != n + 1) == gp.quicksum(
                 r[j][m][k] * x[j, m] for m in M[j]) for j in V if j != 0 for k in self.instance.K_renew)
+        model.addConstrs(gp.quicksum(x[i, m] for m in M[i]) == 1 for i in V)
         # Non-renewable resource constraints
         model.addConstrs(gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) <= self.instance.R[k] for i in V for k in
                          self.instance.K_nonrenew)
@@ -163,7 +175,7 @@ class Benders:
         model.addConstrs(
             s[j] - s[i] >= d[i][m] - N * (1 - y[i, j]) - N * (1 - x[i, m]) for i in V for j in V if i != j for m in
             M[i])
-        model.addConstr(eta >= s[n])
+        model.addConstr(eta >= s[n + 1])
 
         # longest path with minimal job durations
         model.addConstr(eta >= gp.quicksum(min(d[i][m] for m in M[i]) * phi[i, j] for i in V for j in V))
@@ -195,7 +207,7 @@ class Benders:
         M = [self.instance.jobs[j].M for j in V]
 
         # get transitive network from master problem
-        T_E = [(i, j) for i in V for j in V if self.master_y[i, j].X > 0.99]
+        T_E = [(i, j) for i in V for j in V if i != j if self.master_y[i, j].X > 0.99]
         # get mode selection from master problem
         master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
 
@@ -231,7 +243,7 @@ class Benders:
         M = [self.instance.jobs[j].M for j in V]
 
         # get transitive network from master problem
-        T_E = [(i, j) for i in V for j in V if self.master_y[i, j].X > 0.99]
+        T_E = [(i, j) for i in V for j in V if i != j if self.master_y[i, j].X > 0.99]
         # get mode selection from master problem
         master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
 
@@ -259,5 +271,8 @@ class Benders:
             d[e[0]][master_M[e[0]]] * alpha[e[0], e[1]] + d_bar[e[0]][master_M[e[0]]] * w[e[0], e[1]] for e in T_E),
             GRB.MAXIMIZE)
 
-        # update sub-problem model parameter
+        # update sub-problem model and variable parameters
         self.sub_model = model
+        self.sub_alpha = alpha
+        self.sub_w = w
+        self.sub_xi = xi

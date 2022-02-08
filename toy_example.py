@@ -1,25 +1,38 @@
-
 import mrcpsp
 from compact_reformulation import compact_reformulation
 from benders import Benders
 
 # read nominal data
-instance = mrcpsp.load_nominal_mrcpsp('/home/boldm1/OneDrive/robust-mrcpsp/instances/toy_example_data.txt')
+file_path = '/home/boldm1/OneDrive/robust-mrcpsp/instances/toy_example_data.txt'
+instance = mrcpsp.load_nominal_mrcpsp(file_path)
 # set d_bar values explicitly
 instance.set_dbar_explicitly({0: [0], 1: [0, 3], 2: [8, 2], 3: [1], 4: [3], 5: [0], 6: [0]})
-#instance.set_dbar_uncertainty_level(0.7)
 
+# solve parameters
 Gamma = 3
 time_limit = 20
 
-print("Compact reformulation")
+print("\nSolving toy example given in '/home/boldm1/OneDrive/robust-mrcpsp/instances/toy_example_data.txt'...")
+print("\nJob data [r, d, d_bar]:")
+print("-------------------------")
+for i in instance.V:
+    print("job {}:".format(i),
+          [[instance.jobs[i].r[m][0], instance.jobs[i].d[m], instance.jobs[i].d_bar[m]] for m in instance.jobs[i].M])
+
+print("\nCompact reformulation")
 print("---------------------")
-objval, solve_time = compact_reformulation(instance, Gamma, time_limit, write_sol=False)
-print("objval:", objval)
-print("solve_time:", solve_time)
+compact_sol = compact_reformulation(instance, Gamma, time_limit, print_log=False)
+print("objval:", compact_sol['objval'])
+print("solve_time:", compact_sol['solve_time'])
+print("modes:", compact_sol['modes'])
+print("network:", compact_sol['network'])
+print("flows:", compact_sol['flows'])
 
 print("\nBenders'")
 print("--------")
-benders_sol = Benders(instance, Gamma).solve(time_limit, print_log=True)
+benders_sol = Benders(instance, Gamma).solve(time_limit, print_log=False)
 print("objval:", benders_sol['objval'])
 print("solve_time:", benders_sol['solve_time'])
+print("modes:", benders_sol['modes'])
+print("network:", compact_sol['network'])
+print("resource flows:", benders_sol['flows'])
