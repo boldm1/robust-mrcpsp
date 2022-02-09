@@ -47,10 +47,10 @@ def benders_experiment(instances, Gamma, time_limit):
     """
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    results_file = os.path.join(current_dir, 'benders_results.txt')
-    f1 = open(results_file, 'w+')
-    f1.write("instance\tGamma\tobjval\tobjbound\tgap\tn_iterations\tavg_iteration\truntime\n")
-    f1.close()
+    results_file = os.path.join(current_dir, 'benders_results_{}.txt'.format(Gamma))
+    f = open(results_file, 'w+')
+    f.write("instance\tGamma\tobjval\tobjbound\tgap\tn_iterations\tavg_iteration\truntime\n")
+    f.close()
 
     # solve each instance using Benders' and write results
     for instance in instances:
@@ -79,7 +79,7 @@ def compact_reformulation_experiment(instances, Gamma, time_limit):
     """
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    results_file = os.path.join(current_dir, 'compact_reformulation_results.txt')
+    results_file = os.path.join(current_dir, 'compact_reformulation_results_{}.txt'.format(Gamma))
     f = open(results_file, 'w+')
     f.write("instance\tGamma\tobjval\tobjbound\tgap\truntime\n")
     f.close()
@@ -95,5 +95,13 @@ def compact_reformulation_experiment(instances, Gamma, time_limit):
 
 
 instances = create_instances('/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm', uncertainty_level=0.7)
-benders_experiment(instances, 1, 5*60)
-#compact_reformulation_experiment(instances, 1, 5 * 60)
+
+compact_reformulation_experiment(instances, 0, 20 * 60)
+compact_reformulation_experiment(instances, 3, 20 * 60)
+compact_reformulation_experiment(instances, 5, 20 * 60)
+compact_reformulation_experiment(instances, 7, 20 * 60)
+
+benders_experiment(instances, 0, 20 * 60)
+benders_experiment(instances, 3, 20 * 60)
+benders_experiment(instances, 5, 20 * 60)
+benders_experiment(instances, 7, 20 * 60)

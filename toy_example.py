@@ -9,7 +9,7 @@ instance = mrcpsp.load_nominal_mrcpsp(file_path)
 instance.set_dbar_explicitly({0: [0], 1: [0, 3], 2: [8, 2], 3: [1], 4: [3], 5: [0], 6: [0]})
 
 # solve parameters
-Gamma = 3
+Gamma = 4
 time_limit = 20
 
 print("\nSolving toy example given in '/home/boldm1/OneDrive/robust-mrcpsp/instances/toy_example_data.txt'...")
