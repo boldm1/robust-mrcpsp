@@ -26,16 +26,17 @@ def solve(instance, solve_method, Gamma, time_limit):
     # solve instance using compact reformulation
     elif solve_method == 'compact_reformulation':
         print("Solving {} using compact reformulation:".format(instance.name))
-        print('"""""""""""""""""""""""""""""""""""""""')
+        print('"""""""""""""""""""""""""""""""""""""""""""""\n')
         sol = compact_reformulation(instance, Gamma, time_limit, print_log=True)
 
     # solve instance using Benders' decomposition
     elif solve_method == 'benders':
         print("Solving {} using Benders' decomposition:".format(instance.name))
-        print('""""""""""""""""""""""""""""""""""""""""')
+        print('"""""""""""""""""""""""""""""""""""""""""""""\n')
         sol = Benders(instance, Gamma).solve(time_limit, print_log=True)
 
     print("objval:", sol['objval'])
+    print("objbound:", sol['objbound'])
     print("runtime:", sol['runtime'])
 
 
