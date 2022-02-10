@@ -66,6 +66,10 @@ class Benders:
                 print("------------")
                 print("Solving master problem...")
             iteration_start = time.time()  # start timing iteration
+            # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
+            # master problem
+            time_remaining = time_limit - (iteration_start - start_time)
+            self.master_model.setParam('TimeLimit', time_remaining)
             # solve master problem and update LB
             self.master_model.optimize()
             master_objval = self.master_model.ObjVal
@@ -111,7 +115,6 @@ class Benders:
                 self.add_cut(t)
                 iteration_times.append(time.time() - iteration_start)
                 t += 1
-
 
     def create_master_problem(self, print_log=False):
         """
@@ -205,7 +208,6 @@ class Benders:
         self.master_phi = phi
 
     def add_cut(self, t):
-
         """
         Adds optimality cut to master problem based on solution of the sub-problem.
 
