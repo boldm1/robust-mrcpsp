@@ -94,7 +94,7 @@ def compact_reformulation_experiment(instances, Gamma, time_limit):
         f.close()
 
 
-instances = create_instances('/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm', uncertainty_level=0.7)
+instances = create_instances('/home/boldm1/Documents/robust-mrcpsp/instances/j10.mm', uncertainty_level=0.7)
 
 compact_reformulation_experiment(instances, 0, 20 * 60)
 compact_reformulation_experiment(instances, 3, 20 * 60)
