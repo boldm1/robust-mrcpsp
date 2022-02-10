@@ -32,6 +32,7 @@ def compact_reformulation(instance, Gamma, time_limit, print_log=False):
     # Set Gurobi parameters
     model.setParam('TimeLimit', time_limit)
     model.setParam('OutputFlag', print_log)
+    model.setParam('Threads', 4)  # always limit number of threads to 4
 
     G = range(Gamma + 1)  # levels in auxiliary graph
 
