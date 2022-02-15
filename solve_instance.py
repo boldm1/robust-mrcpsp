@@ -1,6 +1,6 @@
 from mrcpsp import load_nominal_mrcpsp
 from benders import Benders
-from compact_reformulation import compact_reformulation
+from compact_reformulation import CompactRefomulation
 
 
 def solve(instance, solve_method, Gamma, time_limit):
@@ -27,19 +27,22 @@ def solve(instance, solve_method, Gamma, time_limit):
     elif solve_method == 'compact_reformulation':
         print("Solving {} using compact reformulation:".format(instance.name))
         print('"""""""""""""""""""""""""""""""""""""""""""""\n')
-        sol = compact_reformulation(instance, Gamma, time_limit, print_log=True)
+        sol = CompactRefomulation(instance, Gamma, time_limit).solve(print_log=True)
 
     # solve instance using Benders' decomposition
     elif solve_method == 'benders':
         print("Solving {} using Benders' decomposition:".format(instance.name))
         print('"""""""""""""""""""""""""""""""""""""""""""""\n')
-        sol = Benders(instance, Gamma).solve(time_limit, print_log=True)
+        sol = Benders(instance, Gamma, time_limit).solve(print_log=True)
 
+    print(sol)
     print("objval:", sol['objval'])
     print("objbound:", sol['objbound'])
     print("runtime:", sol['runtime'])
 
 
-instance = load_nominal_mrcpsp("/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm/j1035_3.mm")
+instance = load_nominal_mrcpsp("/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm/j1010_3.mm")
 instance.set_dbar_uncertainty_level(0.7)
-solve(instance, 'benders', 0, 30)
+Gamma = 3
+time_limit = 30
+solve(instance, 'benders', Gamma, time_limit)

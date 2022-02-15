@@ -5,23 +5,24 @@ from gurobipy import GRB
 
 class Benders:
     """
-    Class to solve robust MRCPSP instance using Bender' style decomposition.
+    Class to solve uncertain MRCPSP instance using Bender' style decomposition.
     """
 
-    def __init__(self, instance, Gamma):
+    def __init__(self, instance, Gamma, time_limit):
         """
-        Initialises Benders object with instance to solve and robustness parameter. Algorithm parameters and master and
-        sub-problem models and variables are also initialised.
+        Initialises Benders object with instance to solve and algorithm parameters.
 
         :param instance: Robust MRCPSP instance to solve
         :type instance: Instance
         :param Gamma: Robustness parameter, i.e. max number of jobs that can achieve worst-case durations
             simultaneously. Takes an integer value from 0 to n (= number of non-dummy jobs in instance).
         :type Gamma: int
-
+        :param time_limit: Max running time of algorithm in seconds. Current UB is returned if time_limit is reached.
+        :type time_limit: int
         """
         self.instance = instance
         self.Gamma = Gamma
+        self.time_limit = time_limit
 
         self.LB = float('-inf')  # LB on objective function of robust MRCPSP instance
         self.UB = float('inf')  # UB on objective function of robust MRCPSP instance
@@ -42,13 +43,11 @@ class Benders:
         self.sub_w = None
         self.sub_xi = None
 
-    def solve(self, time_limit, print_log=False):
+    def solve(self, print_log=False):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
 
-        :param time_limit: Max running time of algorithm in seconds. Current UB is returned if time_limit is reached.
-        :type time_limit: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
         :type print_log: bool
         :return: Dictionary containing solution information.
@@ -57,64 +56,77 @@ class Benders:
         # Benders' decomposition algorithm
         t = 1  # iteration number
         iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
-        best_sol = {}  # dictionary to store x, y, f variable values of best solution
+        best_sol = {'modes': {}, 'network': [], 'flows': {}}  # dict to store x, y, f variable values of best solution
         start_time = time.time()
         self.create_master_problem(print_log)  # create basic master problem with no optimality cuts
         while self.LB < self.UB:
-            if print_log is True:
-                print("Iteration {}".format(t))
-                print("------------")
-                print("Solving master problem...")
             iteration_start = time.time()  # start timing iteration
             # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
             # master problem
-            time_remaining = time_limit - (iteration_start - start_time)
-            self.master_model.setParam('TimeLimit', time_remaining)
-            # solve master problem and update LB
-            self.master_model.optimize()
-            master_objval = self.master_model.ObjVal
-            if master_objval > self.LB:
-                self.LB = self.master_model.ObjVal
-            # solve sub-problem and update UB
-            self.get_subproblem(t, print_log)
-            if print_log is True:
-                print("Solving sub-problem...")
-            self.sub_model.optimize()
-            self.sub_objval = self.sub_model.ObjVal
-            if self.sub_objval < self.UB:
-                self.UB = self.sub_objval
-                # get solution info and save to dict
-                modes = {i: int(sum(m * self.master_x[i, m].X for m in self.instance.jobs[i].M)) for i in
-                         self.instance.V}
-                T_E = [(i, j) for i in self.instance.V for j in self.instance.V if i != j if
-                       self.master_y[i, j].X > 0.99]
-                flows = {(i, j): [self.master_f[i, j, k].X for k in self.instance.K_renew] for i in self.instance.V for
-                         j in self.instance.V if i != self.instance.n + 1 if j != 0 if i != j}
-                best_sol = {'modes': modes, 'network': T_E, 'flows': flows}
-            if print_log is True:
-                print("LB = {}, UB = {}".format(self.LB, self.UB))
-                print("-----------------------------------------------------------------------------\n")
-            # check termination conditions
-            if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
-                # optimal solution
-                runtime = time.time() - start_time
-                iteration_times.append(time.time() - iteration_start)  # add final iteration time
+            time_remaining = self.time_limit - (iteration_start - start_time)
+            # if time limit reached, terminate and return solution
+            if time_remaining <= 0:
                 average_iteration_time = sum(iteration_times) / t
-                return {'objval': self.UB, 'objbound': self.LB, 'runtime': runtime, 'n_iterations': t,
+                return {'objval': self.UB, 'objbound': self.LB, 'runtime': self.time_limit, 'n_iterations': t,
                         'avg_iteration': average_iteration_time,
                         'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
-            elif time.time() - start_time > time_limit:
-                # time-limit reached
-                iteration_times.append(time.time() - iteration_start)  # add final iteration time
-                average_iteration_time = sum(iteration_times) / t
-                return {'objval': self.UB, 'objbound': self.LB, 'runtime': time_limit, 'n_iterations': t,
-                        'avg_iteration': average_iteration_time,
-                        'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
-            # add cut and go to next iteration
             else:
-                self.add_cut(t)
-                iteration_times.append(time.time() - iteration_start)
-                t += 1
+                if print_log is True:
+                    print("Iteration {}".format(t))
+                    print("------------")
+                    print("Solving master problem...")
+                self.master_model.setParam('TimeLimit', time_remaining)
+                # solve master problem
+                self.master_model.optimize()
+                if self.master_model.status == 9:  # if time_limit reached whilst in master problem, terminate
+                    # compute average iteration time, setting to +inf if terminated whilst in first iteration
+                    if len(iteration_times) == 0:
+                        average_iteration_time = float('inf')
+                    else:
+                        average_iteration_time = sum(iteration_times) / t
+                    return {'objval': self.UB, 'objbound': self.LB, 'runtime': self.time_limit, 'n_iterations': t - 1,
+                            'avg_iteration': average_iteration_time,
+                            'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
+                else:
+                    # if master problem provides tighter LB, update
+                    master_objval = self.master_model.ObjVal
+                    if master_objval > self.LB:
+                        self.LB = self.master_model.ObjVal
+                    # solve sub-problem and update UB
+                    self.get_subproblem(t, print_log)
+                    if print_log is True:
+                        print("Solving sub-problem...")
+                    self.sub_model.optimize()
+                    self.sub_objval = self.sub_model.ObjVal
+                    # if sub-problem provides tighter UB, update and record solution
+                    if self.sub_objval < self.UB:
+                        self.UB = self.sub_objval
+                        # get solution info and save to dict
+                        modes = {i: int(sum(m * self.master_x[i, m].X for m in self.instance.jobs[i].M)) for i in
+                                 self.instance.V}
+                        T_E = [(i, j) for i in self.instance.V for j in self.instance.V if i != j if
+                               self.master_y[i, j].X > 0.99]
+                        flows = {(i, j): [self.master_f[i, j, k].X for k in self.instance.K_renew] for i in
+                                 self.instance.V for j in self.instance.V if i != self.instance.n + 1 if j != 0 if
+                                 i != j}
+                        best_sol = {'modes': modes, 'network': T_E, 'flows': flows}
+                    if print_log is True:
+                        print("LB = {}, UB = {}".format(self.LB, self.UB))
+                        print("-----------------------------------------------------------------------------\n")
+                    # check if LB == UB
+                    if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
+                        # optimal solution
+                        runtime = time.time() - start_time
+                        iteration_times.append(time.time() - iteration_start)  # add final iteration time
+                        average_iteration_time = sum(iteration_times) / t
+                        return {'objval': self.UB, 'objbound': self.LB, 'runtime': runtime, 'n_iterations': t,
+                                'avg_iteration': average_iteration_time,
+                                'modes': best_sol['modes'], 'network': best_sol['network'], 'flows': best_sol['flows']}
+                    # add cut and go to next iteration
+                    else:
+                        self.add_cut(t)
+                        iteration_times.append(time.time() - iteration_start)
+                        t += 1
 
     def create_master_problem(self, print_log=False):
         """

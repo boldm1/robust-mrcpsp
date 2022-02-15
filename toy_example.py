@@ -1,5 +1,5 @@
 import mrcpsp
-from compact_reformulation import compact_reformulation
+from compact_reformulation import CompactRefomulation
 from benders import Benders
 
 # read nominal data
@@ -21,7 +21,7 @@ for i in instance.V:
 
 print("\nCompact reformulation")
 print("---------------------")
-compact_sol = compact_reformulation(instance, Gamma, time_limit, print_log=False)
+compact_sol = CompactRefomulation(instance, Gamma, time_limit).solve(print_log=False)
 print("objval:", compact_sol['objval'])
 print("runtime:", compact_sol['runtime'])
 print("modes:", compact_sol['modes'])
@@ -30,7 +30,7 @@ print("resource flows:", compact_sol['flows'])
 
 print("\nBenders'")
 print("--------")
-benders_sol = Benders(instance, Gamma).solve(time_limit, print_log=False)
+benders_sol = Benders(instance, Gamma, time_limit).solve(print_log=False)
 print("objval:", benders_sol['objval'])
 print("runtime:", benders_sol['runtime'])
 print("modes:", benders_sol['modes'])
