@@ -151,7 +151,7 @@ class Benders:
         model_name = '{}_benders_master'.format(self.instance.name)
         model = gp.Model(model_name)
         model.setParam('OutputFlag', print_log)
-        model.setParam('Threads', 4)  # always limit number of threads to 4
+        model.setParam('Threads', 1)  # always limit number of threads to 4
 
         # Create variables
         eta = model.addVar(name="eta")  # variable to represent objective value
@@ -276,7 +276,7 @@ class Benders:
         model_name = '{}_benders_sub_{}'.format(self.instance.name, t)
         model = gp.Model(model_name)
         model.setParam('OutputFlag', print_log)
-        model.setParam('Threads', 4)  # always limit number of threads to 4
+        model.setParam('Threads', 1)  # always limit number of threads to 4
 
         # Add variables to model
         alpha = model.addVars([(i, j) for i in V for j in V], name="alpha", vtype=GRB.BINARY)

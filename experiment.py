@@ -2,7 +2,7 @@ import os
 import re
 from mrcpsp import load_nominal_mrcpsp
 from benders import Benders
-from compact_reformulation import compact_reformulation
+from compact_reformulation import CompactRefomulation
 
 
 def create_instances(instance_dir, uncertainty_level):
@@ -54,7 +54,7 @@ def benders_experiment(instances, Gamma, time_limit):
 
     # solve each instance using Benders' and write results
     for instance in instances:
-        benders_sol = Benders(instance, Gamma).solve(time_limit)
+        benders_sol = Benders(instance, Gamma, time_limit).solve()
         gap = abs(benders_sol['objbound'] - benders_sol['objval']) / abs(benders_sol['objval'])  # optimality gap
         f = open(results_file, 'a')
         f.write(
@@ -86,7 +86,7 @@ def compact_reformulation_experiment(instances, Gamma, time_limit):
 
     # solve each instance using compact reformulation and write results
     for instance in instances:
-        compact_sol = compact_reformulation(instance, Gamma, time_limit)
+        compact_sol = CompactRefomulation(instance, Gamma, time_limit).solve()
         gap = abs(compact_sol['objbound'] - compact_sol['objval']) / abs(compact_sol['objval'])  # optimality gap
         f = open(results_file, 'a')
         f.write("{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, compact_sol['objval'],
