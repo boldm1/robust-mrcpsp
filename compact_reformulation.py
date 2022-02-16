@@ -25,11 +25,13 @@ class CompactRefomulation():
         self.Gamma = Gamma
         self.time_limit = time_limit
 
-    def solve(self, print_log=False):
+    def solve(self, num_threads=4, print_log=False):
         """
         Builds and solves compact reformulation for uncertain MRCPSP. Terminates upon finding an optimal solution or
         reaching the specified time limit.
 
+        :param num_threads: Number of threads to use when solving. Defaults to 4.
+        :type num_threads: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
         :type print_log: bool
         :return: Dictionary containing solution information.
@@ -52,7 +54,7 @@ class CompactRefomulation():
         # Set Gurobi parameters
         model.setParam('OutputFlag', print_log)
         model.setParam('TimeLimit', self.time_limit)
-        model.setParam('Threads', 4)  # always limit number of threads to 4
+        model.setParam('Threads', num_threads)
 
         G = range(self.Gamma + 1)  # levels in auxiliary graph
 

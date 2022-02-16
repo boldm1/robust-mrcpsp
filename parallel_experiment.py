@@ -2,6 +2,7 @@ import os
 import re
 import math
 import argparse
+import warnings
 import multiprocessing
 from filelock import FileLock
 from functools import partial
@@ -22,7 +23,7 @@ def create_instances(instance_dir, uncertainty_level):
     :return: List of uncertain MRCPSP instances.
     :rtype: list
     """
-    instance_files = [instance for instance in os.listdir(instance_dir)][:10]
+    instance_files = [instance for instance in os.listdir(instance_dir)]
     # sort instance files into their natural order
     instance_files = sorted(instance_files, key=lambda f: 10 * int(''.join(re.findall(r'\d+', f[3:5]))) + int(
         ''.join(re.findall(r'\d+', f[5:8]))))
@@ -39,7 +40,7 @@ def create_instances(instance_dir, uncertainty_level):
     return instances
 
 
-def benders_solve_and_write(instance, Gamma, time_limit):
+def benders_solve_and_write(instance, Gamma, time_limit, num_threads):
     """
     Solves uncertain MRCPSP instance using Bender' decomposition and writes result to an (existing) output file.
 
@@ -49,12 +50,14 @@ def benders_solve_and_write(instance, Gamma, time_limit):
     :type Gamma: int
     :param time_limit: Time limit in seconds to give to Benders' algorithm for each instance.
     :type time_limit: int
+    :param num_threads: Number of threads to use when solving instance.
+    :type num_threads: int
     """
     current_dir = os.path.dirname(os.path.realpath(__file__))
     results_file = os.path.join(current_dir, 'benders_results_{}.txt'.format(Gamma))
 
     # solve instance using Benders' and write result
-    benders_sol = Benders(instance, Gamma, time_limit).solve()
+    benders_sol = Benders(instance, Gamma, time_limit).solve(num_threads)
     gap = abs(benders_sol['objbound'] - benders_sol['objval']) / abs(benders_sol['objval'])  # optimality gap
     with FileLock(results_file + '.lock'):  # use FileLock to prevent two processes opening file at same time
         with open(results_file, 'a') as f:
@@ -66,7 +69,7 @@ def benders_solve_and_write(instance, Gamma, time_limit):
                                                                                   benders_sol['runtime']))
 
 
-def parallel_benders_experiment(instances, Gamma, time_limit, num_threads):
+def parallel_benders_experiment(instances, Gamma, time_limit, num_threads, num_processes):
     """
     Solves set of uncertain MRCPSP instances using Benders' decomposition. Available CPUs is split into parallel
     processes with each process being allocated 4 cores. Results are written to output file.
@@ -78,8 +81,10 @@ def parallel_benders_experiment(instances, Gamma, time_limit, num_threads):
     :type Gamma: int
     :param time_limit: Time limit in seconds to allow for solving each instance.
     :type time_limit: int
-    :param num_threads: Total number of available cores.
+    :param num_threads: Number of threads to use in each processes.
     :type num_threads: int
+    :param num_processes: Number of separate processes to use.
+    :type num_processes: int
     """
 
     # create results file
@@ -89,14 +94,14 @@ def parallel_benders_experiment(instances, Gamma, time_limit, num_threads):
         f.write("instance\tGamma\tobjval\tobjbound\tgap\tn_iterations\tavg_iteration\truntime\n")
 
     # set off multiple processes
-    p = multiprocessing.Pool(math.floor(num_threads / 4))
-    p.map(partial(benders_solve_and_write, Gamma=Gamma, time_limit=time_limit), instances)
+    p = multiprocessing.Pool(num_processes)
+    p.map(partial(benders_solve_and_write, Gamma=Gamma, time_limit=time_limit, num_threads=num_threads), instances)
 
     # delete FileLock .lock file
     os.remove(results_file + '.lock')
 
 
-def compact_reformulation_solve_and_write(instance, Gamma, time_limit):
+def compact_reformulation_solve_and_write(instance, Gamma, time_limit, num_threads):
     """
     Solves uncertain MRCPSP instance using compact reformulation and writes result to an (existing) output file.
 
@@ -106,27 +111,27 @@ def compact_reformulation_solve_and_write(instance, Gamma, time_limit):
     :type Gamma: int
     :param time_limit: Time limit in seconds to give to Benders' algorithm for each instance.
     :type time_limit: int
+    :param num_threads: Number of threads to use when solving instance.
+    :type num_threads: int
     """
-    print('starting', instance.name)
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
     results_file = os.path.join(current_dir, 'compact_reformulation_results_{}.txt'.format(Gamma))
 
     # solve instance using compact reformulation and write results
-    compact_sol = CompactRefomulation(instance, Gamma, time_limit).solve()
+    compact_sol = CompactRefomulation(instance, Gamma, time_limit).solve(num_threads)
     gap = abs(compact_sol['objbound'] - compact_sol['objval']) / abs(compact_sol['objval'])  # optimality gap
     with FileLock(results_file + '.lock'):  # use FileLock to prevent two processes opening file at same time
         with open(results_file, 'a') as f:
             f.write("{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, compact_sol['objval'],
                                                                       compact_sol['objbound'], gap,
                                                                       compact_sol['runtime']))
-    print('finishing', instance.name)
 
 
-def parallel_compact_reformulation_experiment(instances, Gamma, time_limit, num_threads):
+def parallel_compact_reformulation_experiment(instances, Gamma, time_limit, num_threads, num_processes):
     """
     Solves set of uncertain MRCPSP instances using compact reformulation. Available CPUs is split into parallel
-    processes with each process being allocated 4 cores. Results are written to output file.
+    processes with each process being allocated num_threads. Results are written to output file.
 
     :param instances: List of uncertain MRCPSP instances to solve.
     :type instances: list
@@ -135,8 +140,10 @@ def parallel_compact_reformulation_experiment(instances, Gamma, time_limit, num_
     :type Gamma: int
     :param time_limit: Time limit in seconds to allow for solving each instance.
     :type time_limit: int
-    :param num_threads: Total number of available cores.
+    :param num_threads: Number of threads to use in each process
     :type num_threads: int
+    :param num_processes: Number of separate processes to use.
+    :type num_processes: int
     """
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -145,38 +152,57 @@ def parallel_compact_reformulation_experiment(instances, Gamma, time_limit, num_
         f.write("instance\tGamma\tobjval\tobjbound\tgap\truntime\n")
 
     # set off multiple processes
-    p = multiprocessing.Pool(math.floor(num_threads / 4))
-    p.map(partial(compact_reformulation_solve_and_write, Gamma=Gamma, time_limit=time_limit), instances)
+    p = multiprocessing.Pool(num_processes)
+    p.map(partial(compact_reformulation_solve_and_write, Gamma=Gamma, time_limit=time_limit, num_threads=num_threads),
+          instances)
 
     # delete FileLock .lock file
     os.remove(results_file + '.lock')
 
 
+def is_valid_directory(arg):
+    """
+    Checks directory path given as input argument exists. Throws an error if it does not.
+    """
+    if os.path.isdir(arg):
+        return arg
+    else:
+        raise argparse.ArgumentTypeError("{} is not a valid directory.".format(arg))
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("solve_method",
-                        choices={'benders', 'compact_formulation'},
+    parser.add_argument("-instance_dir",
+                        type=is_valid_directory,
+                        required=True,
+                        help="Path to directory containing nominal MRCPSP instances.")
+    parser.add_argument("-solve_method",
+                        choices={'benders', 'compact_reformulation'},
+                        required=True,
                         help="Method to solve instances with. Either 'benders' or 'compact_reformulation'.")
-    parser.add_argument("Gamma",
+    parser.add_argument("-Gamma",
                         type=int,
+                        required=True,
                         help="Robustness parameter.")
-    parser.add_argument("time_limit",
+    parser.add_argument("-time_limit",
                         type=int,
+                        required=True,
                         help="Time limit in seconds to use for each instance.")
-    parser.add_argument("num_threads",
+    parser.add_argument("-num_threads",
                         type=int,
-                        help='Total number of threads to use across all processes. Must be at least 4 since Gurobi uses'
-                             '4 threads in solve methods.')
+                        required=True,
+                        help='Number of threads to use for each processes.')
+    parser.add_argument("-num_processes",
+                        type=int,
+                        required=True,
+                        help='Number of processes to use.')
     args = parser.parse_args()
 
-    # check num_threads is at least 4
-    if args.num_threads < 4:
-        raise argparse.ArgumentTypeError("num_threads must be at least 4.")
-
-    instances = create_instances('/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm', uncertainty_level=0.7)
+    instances = create_instances(args.instance_dir, uncertainty_level=0.7)
 
     if args.solve_method == 'benders':
-        parallel_benders_experiment(instances, args.Gamma, args.time_limit, args.num_threads)
+        parallel_benders_experiment(instances, args.Gamma, args.time_limit, args.num_threads, args.num_processes)
     elif args.solve_method == 'compact_reformulation':
-        parallel_compact_reformulation_experiment(instances, args.Gamma, args.time_limit, args.num_threads)
+        parallel_compact_reformulation_experiment(instances, args.Gamma, args.time_limit, args.num_threads,
+                                                  args.num_processes)

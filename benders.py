@@ -43,11 +43,13 @@ class Benders:
         self.sub_w = None
         self.sub_xi = None
 
-    def solve(self, print_log=False):
+    def solve(self, num_threads=4, print_log=False):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
 
+        :param num_threads: Number of threads to use when solving. Defaults to 4.
+        :type num_threads: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
         :type print_log: bool
         :return: Dictionary containing solution information.
@@ -58,7 +60,7 @@ class Benders:
         iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
         best_sol = {'modes': {}, 'network': [], 'flows': {}}  # dict to store x, y, f variable values of best solution
         start_time = time.time()
-        self.create_master_problem(print_log)  # create basic master problem with no optimality cuts
+        self.create_master_problem(num_threads, print_log)  # create basic master problem with no optimality cuts
         while self.LB < self.UB:
             iteration_start = time.time()  # start timing iteration
             # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
@@ -93,7 +95,7 @@ class Benders:
                     if master_objval > self.LB:
                         self.LB = self.master_model.ObjVal
                     # solve sub-problem and update UB
-                    self.get_subproblem(t, print_log)
+                    self.get_subproblem(t, num_threads, print_log)
                     if print_log is True:
                         print("Solving sub-problem...")
                     self.sub_model.optimize()
@@ -128,12 +130,14 @@ class Benders:
                         iteration_times.append(time.time() - iteration_start)
                         t += 1
 
-    def create_master_problem(self, print_log=False):
+    def create_master_problem(self, num_threads=4, print_log=False):
         """
         Creates Gurobi model to represent basic master problem without optimality cuts. The master problem selects job
         processing modes and resource allocations to minimise project duration under nominal job processing times. The
         solution to the master problem provides a LB to optimal robust solution.
 
+        :param num_threads: Number of threads to use when solving. Defaults to 4.
+        :type num_threads: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal when the model is solved.
             Defaults to False.
         :type print_log: bool
@@ -151,7 +155,7 @@ class Benders:
         model_name = '{}_benders_master'.format(self.instance.name)
         model = gp.Model(model_name)
         model.setParam('OutputFlag', print_log)
-        model.setParam('Threads', 1)  # always limit number of threads to 4
+        model.setParam('Threads', num_threads)
 
         # Create variables
         eta = model.addVar(name="eta")  # variable to represent objective value
@@ -248,7 +252,7 @@ class Benders:
         # add cut to list of cuts
         self.cuts.append(cut)
 
-    def get_subproblem(self, t, print_log=False):
+    def get_subproblem(self, t, num_threads=4, print_log=False):
         """
         Takes job processing modes and resource allocations selected by the master problem and builds model to find
         longest path through the project network, considering uncertain job durations. When solved, this model produces
@@ -256,6 +260,8 @@ class Benders:
 
         :param t: Iteration number
         :type t: int
+        :param num_threads: Number of threads to use when solving. Defaults to 4.
+        :type num_threads: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal when the model is solved.
             Defaults to False.
         :type print_log: bool
@@ -276,7 +282,7 @@ class Benders:
         model_name = '{}_benders_sub_{}'.format(self.instance.name, t)
         model = gp.Model(model_name)
         model.setParam('OutputFlag', print_log)
-        model.setParam('Threads', 1)  # always limit number of threads to 4
+        model.setParam('Threads', num_threads)
 
         # Add variables to model
         alpha = model.addVars([(i, j) for i in V for j in V], name="alpha", vtype=GRB.BINARY)
