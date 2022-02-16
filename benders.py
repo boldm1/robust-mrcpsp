@@ -235,10 +235,10 @@ class Benders:
         V = self.instance.V
         M = [self.instance.jobs[j].M for j in V]
 
-        # get transitive network from master problem
-        T_E = [(i, j) for i in V for j in V if i != j if self.master_y[i, j].X > 0.99]
         # get mode selection from master problem
         master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
+        # get longest path from sub-problem
+        sub_path = [(i, j) for i in V for j in V if self.sub_alpha[i, j].X > 0.99]
 
         # some number larger than number of extra precedences in optimal master solution
         N = self.instance.n * self.instance.n
@@ -246,8 +246,8 @@ class Benders:
             1 / 3 * (self.master_y[e[0], e[1]] + self.master_x[e[0], master_M[e[0]]] +
                      self.master_x[e[1], master_M[e[1]]]) -
             N * (3 - self.master_y[e[0], e[1]] - self.master_x[e[0], master_M[e[0]]] -
-                 self.master_x[e[1], master_M[e[1]]]) for e in T_E)
-                                          - (self.sub_objval - self.LB) * (len(T_E) - 1) + self.LB,
+                 self.master_x[e[1], master_M[e[1]]]) for e in sub_path)
+                                          - (self.sub_objval - self.LB) * (len(sub_path) - 1) + self.LB,
                                           name="cut_{}".format(t))
         # add cut to list of cuts
         self.cuts.append(cut)

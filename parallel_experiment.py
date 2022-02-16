@@ -86,7 +86,6 @@ def parallel_benders_experiment(instances, Gamma, time_limit, num_threads, num_p
     :param num_processes: Number of separate processes to use.
     :type num_processes: int
     """
-
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
     results_file = os.path.join(current_dir, 'benders_results_{}.txt'.format(Gamma))
@@ -99,6 +98,8 @@ def parallel_benders_experiment(instances, Gamma, time_limit, num_threads, num_p
 
     # delete FileLock .lock file
     os.remove(results_file + '.lock')
+    # reorder instances in results file
+    reorder_results(results_file)
 
 
 def compact_reformulation_solve_and_write(instance, Gamma, time_limit, num_threads):
@@ -158,6 +159,37 @@ def parallel_compact_reformulation_experiment(instances, Gamma, time_limit, num_
 
     # delete FileLock .lock file
     os.remove(results_file + '.lock')
+    # reorder instances in results file
+    reorder_results(results_file)
+
+
+def reorder_results(results_file):
+    """
+    Reorders rows in results_file according to instance name.
+
+    :param results_file: File of results to reorder.
+    :type results_file: str
+    """
+    # read data from results file and delete ready to write new file
+    data = {}  # dict to store data for each instance, keyed by instance name.
+    with open(results_file, 'r') as f:
+        raw_lines = f.read().splitlines()
+    first_line = raw_lines[0]
+    for line in raw_lines[1:]:
+        instance_name = line.split('\t')[0]
+        data[instance_name] = line
+    os.remove(results_file)
+
+    # get list of instance names and sort into their natural order
+    instance_names = list(data.keys())
+    instance_names = sorted(instance_names, key=lambda i: 10 * int(''.join(re.findall(r'\d+', i[3:5]))) + int(
+        ''.join(re.findall(r'\d+', i[5:8]))))
+
+    # write data to new file in correct order
+    with open(results_file, 'w+') as f:
+        f.write(first_line + '\n')
+        for instance in instance_names:
+            f.write(data[instance] + '\n')
 
 
 def is_valid_directory(arg):
