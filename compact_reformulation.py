@@ -2,7 +2,7 @@ import gurobipy as gp
 from gurobipy import GRB
 
 
-class CompactRefomulation():
+class CompactRefomulation:
     """
     Class to solve uncertain MRCPSP instance using compact reformulation.
     """

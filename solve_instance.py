@@ -1,4 +1,3 @@
-from mrcpsp import load_nominal_mrcpsp
 from benders import Benders
 from compact_reformulation import CompactRefomulation
 
@@ -39,10 +38,3 @@ def solve(instance, solve_method, Gamma, time_limit):
     print("objval:", sol['objval'])
     print("objbound:", sol['objbound'])
     print("runtime:", sol['runtime'])
-
-
-instance = load_nominal_mrcpsp("/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm/j1010_3.mm")
-instance.set_dbar_uncertainty_level(0.7)
-Gamma = 3
-time_limit = 30
-solve(instance, 'benders', Gamma, time_limit)

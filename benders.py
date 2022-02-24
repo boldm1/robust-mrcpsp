@@ -59,10 +59,10 @@ class Benders:
         t = 1  # iteration number
         iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
         best_sol = {'modes': {}, 'network': [], 'flows': {}}  # dict to store x, y, f variable values of best solution
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.create_master_problem(num_threads, print_log)  # create basic master problem with no optimality cuts
         while self.LB < self.UB:
-            iteration_start = time.time()  # start timing iteration
+            iteration_start = time.perf_counter()  # start timing iteration
             # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
             # master problem
             time_remaining = self.time_limit - (iteration_start - start_time)
@@ -118,8 +118,8 @@ class Benders:
                     # check if LB == UB
                     if self.UB - self.LB < 1e-6:  # allow for numerical imprecision
                         # optimal solution
-                        runtime = time.time() - start_time
-                        iteration_times.append(time.time() - iteration_start)  # add final iteration time
+                        runtime = time.perf_counter() - start_time
+                        iteration_times.append(time.perf_counter() - iteration_start)  # add final iteration time
                         average_iteration_time = sum(iteration_times) / t
                         return {'objval': self.UB, 'objbound': self.LB, 'runtime': runtime, 'n_iterations': t,
                                 'avg_iteration': average_iteration_time,
@@ -127,7 +127,7 @@ class Benders:
                     # add cut and go to next iteration
                     else:
                         self.add_cut(t)
-                        iteration_times.append(time.time() - iteration_start)
+                        iteration_times.append(time.perf_counter() - iteration_start)
                         t += 1
 
     def create_master_problem(self, num_threads=4, print_log=False):
