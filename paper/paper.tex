@@ -1,0 +1,128 @@
+
+\documentclass[a4paper,abstracton]{scrartcl}
+
+% author and affiliation block
+\usepackage{authblk}
+\renewcommand\Affilfont{\small}
+
+% maths packages
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{bm}
+
+% bibliography and referencing
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\definecolor{darkgreen}{RGB}{0,127,173}
+\definecolor{darkblue}{RGB}{0,0,200}
+\hypersetup{colorlinks, linkcolor={darkblue}, citecolor={darkgreen}, urlcolor={darkblue}}
+
+
+
+% figures and graphics
+\usepackage{graphicx}
+\graphicspath{{figures/}}  % path to directory containing all figures
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%  Macros
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\F}{{\mathcal{F}}}
+\newcommand{\M}{{\mathcal{M}}}
+\newcommand{\U}{{\mathcal{U}}}
+\newcommand{\X}{{\mathcal{X}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{A faster exact method for solving the robust multi-mode resource-constrained project scheduling problem}
+
+\author[1]{Matthew Bold\footnote{Corresponding author, email: m.bold1@lancaster.ac.uk}}
+\author[2]{Marc Goerigk}
+
+\affil[1]{STOR-i Centre for Doctoral Training, Lancaster University, Lancaster, UK}	
+\affil[2]{Network and Data Science Management, University of Siegen, Siegen, Germany}	
+
+\date{}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\noindent\textbf{Keywords:} project scheduling; optimisation under uncertainty; robust optimisation; budgeted uncertainty
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+The multi-mode resource-constrained project scheduling problem (MRCPSP) is a generalisation of the widely-studied resource-constrained project scheduling problem (RCPSP) to include multiple processing modes for each activity. The purpose of introducing activity processing modes is to model situations in which there is more than one way of executing project activities, with each option having its own duration and resource requirements. The MRCPSP consists selecting the processing modes and start times for a given set of activities, subject to a set of precedence constraints and limited resource availability, with the objective of minimising the overall project duration, known as the makespan.
+
+The work in the paper extends the compact reformulation for the RCPSP developed by \cite{bold2021compact} for application to the MRCPSP. A computational study is presented comparing this approach against the Benders' decomposition approach used in \cite{balouka2021robust} for solving MRCPSP instances with uncertain activity durations. Note that the method used in \cite{balouka2021robust} is an extension of the approach used by \cite{bruni2017adjustable} to solve the RCPSP with uncertain activity durations.
+
+\section{Problem description}
+
+A project consists of a set of non-preemptive activities $V=\{0,1,\dots,n,n+1\}$, where 0 and $n+1$ denote the dummy source and sink activities respectively. Each activity $i\in V$ has a set of available processing modes given by $M_i=\{1,\dots,|M_i|\}$. We denote a particular choice of mode selections as $\bm{m}=(m_1,\dots,m_n)$, and the set of all possible mode selections by $\M\subseteq \mathbb{N}^n$. The nominal duration of activity $i$ when executed in mode $m_i\in M_i$ is given by $\hat{d}_{im_i}$, whilst its worst-case duration is given by $\bar{d}_{im_i}+\hat{d}_{im_i}$, where $\hat{d}_{im_i}$ is its maximum durational deviation. Each mode for activity $i$, $m_i\in M_i$, has an associated renewable resource requirement of $r_{im_ik}$ for each $k\in K$, where $K$ is the set of renewable resource types involved in the project. Each renewable resource $k\in K$ has an availability of $R^_{k}$ at each time period in the project horizon. As well as resource constraints, the project is subject to a set of strict finish-to-start precedence constraints given by $E$, where $(i,j)\in E$ enforces that activity $i$ must finish before activity $j$ can begin. A project can be represented on a directed graph $G(V,E)$. /FIGURE shows an example project involving seven non-dummy activities and a single renewable resource.
+
+For a given choice of processing modes for each activity $\bm{m}$, we assume that the activity durations lie somewhere in a budgeted uncertainty set of the form
+$$\U_{\bm{m}}(\Gamma)=\Bigg\{\bm{d}\in\mathbb{R}_+^{|V|}:d_{im_i}=\bar{d}_{im_i}+\zeta_i\hat{d}_{im_i},\,0\leq \zeta_i \leq 1,\,\forall i\in V,\,\sum_{i\in V}\zeta_i \leq \Gamma\Bigg\}.$$
+Introduced by \cite{bertsimas2004price}, the motivation of the budgeted uncertainty set is to control the pessimism of the solution by introducing a robustness parameter $\Gamma$ to limit the number of jobs that can simultaneously achieve their worst-case durations. Observe that when $\Gamma=0$, each activity takes its nominal duration and the resulting problem is the deterministic MRCPSP. At the other extreme, when $\Gamma=n$, every activity takes its worst-case duration, in which case the uncertainty set becomes equivalent to an interval uncertainty set. In this case the problem can again be solved as a deterministic MRCPSP instance considering only worst-case durations.
+
+For a given selection of activity modes $\bm{m}$, a forbidden set is defined to be any subset of activities $F_{\bm{m}}\subseteq V$ that are not precedence-related, such that $\sum_{i\in F_{\bm{m}}}r_{im_ik}>R_k$ for at least one resource $k\in K$. That is, a forbidden set is a collection of activities that cannot be executed in parallel only because of resource limitations.
+
+Applying the main representation theorem of \cite{bartusch1988scheduling}, given a particular choice of activity modes $\bm{m}$, a solution to the MRCPSP can be defined by a set of additional precedences $X_{\bm{m}}\subseteq V^2\setminus E$ such that the extended precedence network $G(V,E\cup X_{\bm{m}})$ is acyclic and contains no forbidden sets. Such an extension to the project network is referred to as a \textit{sufficient selection}. 
+
+Hence the two-stage robust MRCPSP under budgeted uncertainty, which we refer to as the robust MRCPSP, can be written as
+\begin{align}
+	& \min_{\bm{m}\in \M,\,X_{\bm{m}}\in \X_{\bm{m}}} \max_{\bm{d}\in\U_{\bm{m}}(\Gamma)} \min_{\bm{S}} S_{n+1}\label{eqn:robust_mrcpsp_1}\\
+	& S_0 = 0\\
+	& S_j - S_i \geq d_{im_i} \qquad \forall (i,j)\in E\cup X_{\bm{m}}\\
+	& S_i \geq 0 \qquad \forall i\in V.\label{eqn:robust_mrcpsp_4}
+\end{align}
+This problem aims to selects activity modes and a corresponding sufficient selection in order to minimise the worst-case project makespan. 
+
+\section{A compact reformulation}
+
+We propose solving this problem using an extended version of the compact reformulation from \cite{bold2021compact}. The development of this formulation for the RCPSP involved a reformulation of the adversarial sub-problem of determining the worst-case distribution of $\Gamma$ delays among the project activities. The reformulated sub-problem took the form of a longest-path problem through an augmented project network. 
+
+The derivation for the equivalent compact reformulation for the MRCPSP is more or less identical to the one presented in that paper for the RCPSP. We therefore omit its derivation here, and instead just present the resulting model.
+
+\begin{align}
+\min \ & S_{n+1,\Gamma}\label{eqn:compact1}\\
+\text{s.t. } & S_{00}=0\label{eqn:compact2}\\
+	     & S_{j\gamma} - S_{i\gamma} \geq \bar{d}_{im}x_{im} - N(1-y_{ij}) & \hspace{-5cm}\forall (i,j)\in V^2,\,\forall m\in M_i,\,\gamma=0,\dots,\Gamma\label{eqn:compact_bigM1}\\
+	     & S_{j,\gamma+1} - S_{i\gamma} \geq (\bar{d}_{im} + \hat{d}_{im})x_{im} - N(1-y_{ij})\nonumber \\
+	     &&\hspace{-5cm} \forall (i,j)\in V^2,\, m\in M_i,\,\gamma = 0,\dots,\Gamma-1\label{eqn:compact_bigM2}\\
+	     & y_{ij}=1 & \forall (i,j) \in E\cup\{(n+1,n+1)\}\label{eqn:compact5}\\
+	     & f_{ijk}\leq P_{ijk}y_{ij} & \hspace{-5cm}\forall (i,j)\in V^2,\,i\neq n+1,\,j\neq0,\, \forall k \in K\label{eqn:compact6}\\
+	     & \sum_{i\in V\setminus\{n+1\}}f_{ijk}=\sum_{m\in M_j}r_{jmk}x_{jm} & \forall j \in V\setminus\{0\} ,\, \forall k\in K\label{eqn:compact7}\\
+	     & \sum_{j\in V\setminus\{0\}}f_{ijk}=\sum_{m\in M_i}r_{imk}x_{im} & \forall i \in V\setminus\{n+1\},\,\forall k\in K\label{eqn:compact8}\\
+	     & \sum_{m\in M_i}x_{im} = 1 & \forall i\in V\label{eqn:compact9}\\
+	     & \sum_{m\in M_i}r^{\nu}_{imk}x_{im} \leq R^{\nu}_k & \forall i \in V,\,k\in K^{\nu}\\
+	     & S_{i\gamma}\geq 0 &\forall i\in V,\,\gamma \in 0,\dots, \Gamma\label{eqn:compact10}\\
+	     & f_{ijk}\geq 0 & \forall (i,j)\in V^2 ,\, \forall k \in K\label{eqn:compact11}\\
+	     & y_{ij}\in\{0,1\} & \forall (i,j)\in V^2\label{eqn:compact12}\\
+	     & x_{im}\in\{0,1\} & \forall i\in V,\,m\in M_i,
+\end{align}
+where $N=\sum_{i\in V}\max_{m\in M_i}(\bar{d}_{im}+\hat{d}_{im})$ is an upper bound on the minimum makespan, and $P_{ijk}=\min\{\max_{m\in M_i}r_{imk},\,\max_{m\in M_j} r_{jmk}\}$ is the maximum possible flow of resource $k$ from $i$ into $j$.
+
+This formulation can be solved directly by a standard mathematical optimisation solver such as Gurobi or CPLEX.
+
+\section{A Benders' decomposition approach}
+
+In this section we outline the Benders' decomposition approach to solving the robust MRCPSP first presented in \cite{balouka2021robust}.
+
+\section{Computational experiments and results}
+
+\section{Conclusions}
+
+
+\section*{Acknowledgements}
+
+The authors are grateful for the support of the EPSRC-funded (EP/L015692/1) STOR-i Centre for Doctoral Training.
+
+\bibliography{paper}
+
+\end{document}
+
