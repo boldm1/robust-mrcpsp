@@ -1,0 +1,1 @@
+instance	Gamma	objval	objbound	gap	n_iterations	avg_iteration	runtime
