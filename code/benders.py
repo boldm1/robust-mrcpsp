@@ -244,14 +244,12 @@ class Benders:
         sub_path = [(e[0], e[1]) for e in T_E if self.sub_alpha[e[0], e[1]].X > 0.99]
 
         # some number larger than number of extra precedences in optimal master solution
-        N = self.instance.n * self.instance.n
         cut = self.master_model.addConstr(self.master_eta >= (self.sub_objval - self.LB) * gp.quicksum(
             1 / 3 * (self.master_y[e[0], e[1]] + self.master_x[e[0], master_M[e[0]]] +
                      self.master_x[e[1], master_M[e[1]]]) -
-            N * (3 - self.master_y[e[0], e[1]] - self.master_x[e[0], master_M[e[0]]] -
-                 self.master_x[e[1], master_M[e[1]]]) for e in sub_path)
-                                          - (self.sub_objval - self.LB) * (len(sub_path) - 1) + self.LB,
-                                          name="cut_{}".format(t))
+            (3 - self.master_y[e[0], e[1]] - self.master_x[e[0], master_M[e[0]]] - self.master_x[e[1], master_M[e[1]]])
+            for e in sub_path) - (self.sub_objval - self.LB) * (
+                                                  len(sub_path) - 1) + self.LB, name="cut_{}".format(t))
         # add cut to list of cuts
         self.cuts.append(cut)
 
