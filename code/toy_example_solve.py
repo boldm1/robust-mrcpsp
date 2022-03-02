@@ -6,7 +6,7 @@ from benders import Benders
 def solve_toy_example(nominal_data_file, Gamma, max_durational_deviations=None):
     """
     Solves toy example given in nominal_data_file for given Gamma. Max durational deviations can be explicitly provided
-    for each activity in the input, but if these are not provided, the max deviations are set to 0.5 * nominal values.
+    for each activity in the input, but if not provided they are set to 0.5 * nominal values.
     """
     # load instance
     instance = mrcpsp.load_nominal_mrcpsp(nominal_data_file)
@@ -34,18 +34,26 @@ def solve_toy_example(nominal_data_file, Gamma, max_durational_deviations=None):
 
     print("\nBenders'")
     print("--------")
-    benders_sol = Benders(instance, Gamma, time_limit=20).solve(print_log=False)
+    benders_sol = Benders(instance, Gamma, time_limit=20).solve(print_log=True)
     print("objval:", benders_sol['objval'])
     print("runtime:", benders_sol['runtime'])
+    print("n_iterations:", benders_sol['n_iterations'])
     print("modes:", benders_sol['modes'])
     print("network:", compact_sol['network'])
     print("resource flows:", benders_sol['flows'])
 
 
 if __name__ == "__main__":
-    balouka_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/instances/mrcpsp_toy_example_data.txt'
+
+    # toy example from Balouka & Cohen (2021)
+    balouka_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/code/instances/mrcpsp_toy_example_data.txt'
     balouka_max_durational_deviations = {0: [0], 1: [0, 3], 2: [8, 2], 3: [1], 4: [3], 5: [0], 6: [0]}
 
-    paper_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/instances/paper_toy_example_data.txt'
+    # toy example from Bruni et al. (2017)
+    bruni_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/code/instances/rcpsp_toy_example_data.txt'
 
-    solve_toy_example(balouka_toy_example, 3)
+    # toy example for my paper
+    paper_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/code/instances/paper_toy_example_data.txt'
+    zero_durational_deviations = {0: [0], 1: [0], 2: [0, 0], 3: [0], 4: [0], 5: [0, 0], 6: [0]}
+
+    solve_toy_example(paper_toy_example, 2)

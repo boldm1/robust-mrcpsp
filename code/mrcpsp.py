@@ -194,15 +194,26 @@ class Instance:
             specified for each possible mode.
         :type d_bar: dict
         """
+        # check each job has an entry in d_bar
+        no_value = []
+        for j in self.V:
+            try:
+                v = d_bar[j]
+            except KeyError:
+                no_value.append(j)
+        if len(no_value) > 0:
+            raise Exception(f"d_bar does not have an entry for job {str(no_value)[1:-1]}. Please correct this and try "
+                            "again.")
+
         # check each job in d_bar has values for each of its possible modes
         to_fix = []
         for j in self.V:
             if len(d_bar[j]) != len(self.jobs[j].M):
                 to_fix.append(j)
         # throw error if to_fix is non-empty
-        if to_fix:
-            raise Exception("The number of values specified in d_bar for jobs {} does not match the number of modes for"
-                            " those jobs! Please correct this and try again.".format(str(to_fix)[1:-1]))
+        if len(to_fix) > 0:
+            raise Exception(f"The number of values specified in d_bar for jobs {str(to_fix)[1:-1]} does not match the "
+                            "number of modes for those jobs! Please correct this and try again.")
 
         # set d_bar
         for j in d_bar:

@@ -94,10 +94,12 @@ class Benders:
                     master_objval = self.master_model.ObjVal
                     if master_objval > self.LB:
                         self.LB = self.master_model.ObjVal
+                    if print_log is True:
+                        self.print_master_sol()
                     # solve sub-problem and update UB
                     self.get_subproblem(t, num_threads, print_log)
                     if print_log is True:
-                        print("Solving sub-problem...")
+                        print("\nSolving sub-problem...")
                     self.sub_model.optimize()
                     self.sub_objval = self.sub_model.ObjVal
                     # if sub-problem provides tighter UB, update and record solution
@@ -129,6 +131,22 @@ class Benders:
                         self.add_cut(t)
                         iteration_times.append(time.perf_counter() - iteration_start)
                         t += 1
+
+    def print_master_sol(self):
+        """
+        Prints mode selection, transitive network and resource flows from master solution to the terminal.
+        """
+        modes = {i: int(sum(m * self.master_x[i, m].X for m in self.instance.jobs[i].M)) for i in
+                 self.instance.V}
+        T_E = [(i, j) for i in self.instance.V for j in self.instance.V if i != j if
+               self.master_y[i, j].X > 0.99]
+        flows = {(i, j): [self.master_f[i, j, k].X for k in self.instance.K_renew] for i in
+                 self.instance.V for j in self.instance.V if i != self.instance.n + 1 if j != 0 if
+                 i != j}
+        print("master objval:", self.master_model.ObjVal)
+        print("modes:", modes)
+        print("network:", T_E)
+        print("resource flows:", flows)
 
     def create_master_problem(self, num_threads=4, print_log=False):
         """
