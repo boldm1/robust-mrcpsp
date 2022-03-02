@@ -48,22 +48,21 @@ def benders_experiment(instances, Gamma, time_limit):
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
     results_file = os.path.join(current_dir, 'benders_results_{}.txt'.format(Gamma))
-    f = open(results_file, 'w+')
-    f.write("instance\tGamma\tobjval\tobjbound\tgap\tn_iterations\tavg_iteration\truntime\n")
-    f.close()
+    with open(results_file, 'w+') as f:
+        f.write("instance\tGamma\tobjval\tobjbound\tgap\tn_iterations\tavg_iteration\truntime\n")
 
     # solve each instance using Benders' and write results
     for instance in instances:
         benders_sol = Benders(instance, Gamma, time_limit).solve()
         gap = abs(benders_sol['objbound'] - benders_sol['objval']) / abs(benders_sol['objval'])  # optimality gap
-        f = open(results_file, 'a')
-        f.write(
-            "{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, benders_sol['objval'],
-                                                                          benders_sol['objbound'], gap,
-                                                                          benders_sol['n_iterations'],
-                                                                          benders_sol['avg_iteration'],
-                                                                          benders_sol['runtime']))
-        f.close()
+        with open(results_file, 'a') as f:
+            f.write(
+                "{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma,
+                                                                              benders_sol['objval'],
+                                                                              benders_sol['objbound'], gap,
+                                                                              benders_sol['n_iterations'],
+                                                                              benders_sol['avg_iteration'],
+                                                                              benders_sol['runtime']))
 
 
 def compact_reformulation_experiment(instances, Gamma, time_limit):
@@ -80,29 +79,28 @@ def compact_reformulation_experiment(instances, Gamma, time_limit):
     # create results file
     current_dir = os.path.dirname(os.path.realpath(__file__))
     results_file = os.path.join(current_dir, 'compact_reformulation_results_{}.txt'.format(Gamma))
-    f = open(results_file, 'w+')
-    f.write("instance\tGamma\tobjval\tobjbound\tgap\truntime\n")
-    f.close()
+    with open(results_file, 'w+') as f:
+        f.write("instance\tGamma\tobjval\tobjbound\tgap\truntime\n")
 
     # solve each instance using compact reformulation and write results
     for instance in instances:
         compact_sol = CompactRefomulation(instance, Gamma, time_limit).solve()
         gap = abs(compact_sol['objbound'] - compact_sol['objval']) / abs(compact_sol['objval'])  # optimality gap
-        f = open(results_file, 'a')
-        f.write("{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, compact_sol['objval'],
-                                                                  compact_sol['objbound'], gap, compact_sol['runtime']))
-        f.close()
+        with open(results_file, 'a') as f:
+            f.write("{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, compact_sol['objval'],
+                                                                      compact_sol['objbound'], gap,
+                                                                      compact_sol['runtime']))
 
 
 if __name__ == '__main__':
-    instances = create_instances('/home/boldm1/OneDrive/robust-mrcpsp/instances/j10.mm', uncertainty_level=0.7)
+    instances = create_instances('/home/boldm1/OneDrive/robust-mrcpsp/code/instances/j10.mm', uncertainty_level=0.7)
 
-    #compact_reformulation_experiment(instances, 0, 20 * 60)
-    #compact_reformulation_experiment(instances, 3, 20 * 60)
-    #compact_reformulation_experiment(instances, 5, 20 * 60)
-    #compact_reformulation_experiment(instances, 7, 20 * 60)
+    # compact_reformulation_experiment(instances, 0, 20 * 60)
+    # compact_reformulation_experiment(instances, 3, 20 * 60)
+    # compact_reformulation_experiment(instances, 5, 20 * 60)
+    # compact_reformulation_experiment(instances, 7, 20 * 60)
 
-    #benders_experiment(instances, 0, 20 * 60)
+    # benders_experiment(instances, 0, 20 * 60)
     benders_experiment(instances, 3, 20 * 60)
-    #benders_experiment(instances, 5, 20 * 60)
-    #benders_experiment(instances, 7, 20 * 60)
+    # benders_experiment(instances, 5, 20 * 60)
+    # benders_experiment(instances, 7, 20 * 60)

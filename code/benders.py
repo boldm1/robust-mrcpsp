@@ -235,10 +235,13 @@ class Benders:
         V = self.instance.V
         M = [self.instance.jobs[j].M for j in V]
 
+        # transitive network from master problem
+        T_E = [(i, j) for i in V for j in V if i != j if self.master_y[i, j].X > 0.99]
+
         # get mode selection from master problem
         master_M = [int(sum(m * self.master_x[i, m].X for m in M[i])) for i in V]
         # get longest path from sub-problem
-        sub_path = [(i, j) for i in V for j in V if self.sub_alpha[i, j].X > 0.99]
+        sub_path = [(e[0], e[1]) for e in T_E if self.sub_alpha[e[0], e[1]].X > 0.99]
 
         # some number larger than number of extra precedences in optimal master solution
         N = self.instance.n * self.instance.n
@@ -285,8 +288,8 @@ class Benders:
         model.setParam('Threads', num_threads)
 
         # Add variables to model
-        alpha = model.addVars([(i, j) for i in V for j in V], name="alpha", vtype=GRB.BINARY)
-        w = model.addVars([(i, j) for i in V for j in V], name="w", vtype=GRB.CONTINUOUS, lb=0)
+        alpha = model.addVars([(e[0], e[1]) for e in T_E], name="alpha", vtype=GRB.BINARY)
+        w = model.addVars([(e[0], e[1]) for e in T_E], name="w", vtype=GRB.CONTINUOUS, lb=0)
         xi = model.addVars([i for i in V], name="xi", vtype=GRB.CONTINUOUS, lb=0, ub=1)
 
         # Add constraints to model
