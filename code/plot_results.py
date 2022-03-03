@@ -47,7 +47,7 @@ def get_results(results_dir, solve_methods, Gammas):
                         file_data[instance] = {'objval': float(splitline[2]), 'objbound': float(splitline[3]),
                                                'gap': float(splitline[4]), 'n_iterations': int(splitline[5]),
                                                'avg_iteration': float(splitline[6]), 'runtime': float(splitline[7])}
-                    elif method == 'compact_reformulation':
+                    elif 'compact_reformulation' in method:
                         file_data[instance] = {'objval': float(splitline[2]), 'objbound': float(splitline[3]),
                                                'gap': float(splitline[4]), 'runtime': float(splitline[5])}
             results_data[method][g] = file_data
@@ -104,9 +104,10 @@ def plot_gaps(results_data, solve_methods, Gammas, save_path):
     plt.rc('text', usetex=True)
     plt.figure()
     for method in solve_methods:
-        method_name = method.replace('_', ' ').capitalize()  # format method name for legend
+        method_name = method.replace('_', ' ').replace('trans', '').capitalize()  # format method name for legend
         plt.plot([100 * v for v in gap_values], [100 * v for v in less_than_gap[method]], label=method_name)
     plt.xlim([0, 100 * max_gap])
+    plt.ylim([0, 105])
     plt.xlabel(r'Gap (\%)')
     plt.ylabel(r'\% of instances')
     plt.legend(loc=4, frameon=False)
@@ -174,9 +175,10 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
     plt.rc('text', usetex=True)
     plt.figure()
     for method in solve_methods:
-        method_name = method.replace('_', ' ').capitalize()  # format method name for legend
+        method_name = method.replace('_', ' ').replace('trans', '').capitalize()  # format method name for legend
         plt.plot(taus, perf_profile[method], label=method_name)
     plt.xlim([0, max(taus)])
+    plt.ylim([0, 1.05])
     plt.xlabel(r'$\tau$')
     plt.ylabel(r'$\mathrm{P}(\log(p_{im})\leq \tau)$')
     plt.legend(loc=4, frameon=False)
@@ -184,9 +186,9 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
 
 
 if __name__ == "__main__":
-    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j10_7200/',
-                           ['benders', 'compact_reformulation'], [3, 5, 7])
-    plot_gaps(results, ['benders', 'compact_reformulation'], [3, 5, 7],
+    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j20_7200/',
+                          ['benders', 'compact_reformulation_trans'], [5, 10, 15])
+    plot_gaps(results, ['benders', 'compact_reformulation_trans'], [5, 10, 15],
               '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
-    plot_performance_profile(results, ['benders', 'compact_reformulation'], [3, 5, 7],
+    plot_performance_profile(results, ['benders', 'compact_reformulation_trans'], [5, 10, 15],
                              '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
