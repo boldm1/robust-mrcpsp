@@ -80,6 +80,8 @@ class Benders:
                 self.master_model.setParam('TimeLimit', time_remaining)
                 # solve master problem
                 self.master_model.optimize()
+                if print_log is True:
+                    self.print_master_sol()
                 if self.master_model.status == 9:  # if time_limit reached whilst in master problem, terminate
                     # compute average iteration time, setting to +inf if terminated whilst in first iteration
                     if len(iteration_times) == 0:
@@ -94,14 +96,14 @@ class Benders:
                     master_objval = self.master_model.ObjVal
                     if master_objval > self.LB:
                         self.LB = self.master_model.ObjVal
-                    if print_log is True:
-                        self.print_master_sol()
                     # solve sub-problem and update UB
                     self.get_subproblem(t, num_threads, print_log)
                     if print_log is True:
                         print("\nSolving sub-problem...")
                     self.sub_model.optimize()
                     self.sub_objval = self.sub_model.ObjVal
+                    if print_log is True:
+                        self.print_subproblem_sol()
                     # if sub-problem provides tighter UB, update and record solution
                     if self.sub_objval < self.UB:
                         self.UB = self.sub_objval
@@ -147,6 +149,14 @@ class Benders:
         print("modes:", modes)
         print("network:", T_E)
         print("resource flows:", flows)
+
+    def print_subproblem_sol(self):
+        """
+        Prints longest path found in subproblem to the terminal.
+        """
+        T_E = [(i, j) for i in self.instance.V for j in self.instance.V if i != j if self.master_y[i, j].X > 0.99]
+        longest_path = [(e[0], e[1]) for e in T_E if self.sub_alpha[e[0], e[1]].X > 0.99]
+        print("longest path:", longest_path)
 
     def create_master_problem(self, num_threads=4, print_log=False):
         """

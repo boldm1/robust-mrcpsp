@@ -51,6 +51,7 @@ if __name__ == "__main__":
 
     # toy example from Bruni et al. (2017)
     bruni_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/code/instances/rcpsp_toy_example_data.txt'
+    bruni_max_durational_deviations = {0: [0], 1: [2], 2: [1], 3: [3], 4: [2], 5: [1], 6: [1], 7: [1], 8: [0]}
 
     # toy example for my paper
     paper_toy_example = '/home/boldm1/OneDrive/robust-mrcpsp/code/instances/paper_toy_example_data.txt'
