@@ -190,8 +190,8 @@ class Instance:
         """
         Function to explicitly set d_bar for each mode of jobs in Instance.
 
-        :param d_bar: Dict with d_bar values for (a subset of) jobs in Instance. For each job in d_bar, values must be
-            specified for each possible mode.
+        :param d_bar: Dict with d_bar values for jobs in Instance. Values must be provided for each mode of each job in
+            instance.
         :type d_bar: dict
         """
         # check each job has an entry in d_bar

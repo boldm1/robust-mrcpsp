@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def read_results(results_dir, solve_methods, Gammas):
+def get_results(results_dir, solve_methods, Gammas):
     """
     Reads specified results files from directory and returns dictionary of results data.
 
@@ -36,10 +36,9 @@ def read_results(results_dir, solve_methods, Gammas):
     for method in solve_methods:
         results_data[method] = {}
         for g in Gammas:
-            file_name = f"{method}_results_{g}.txt"
-            file_path = os.path.join(results_dir, file_name)
+            file_name = os.path.join(results_dir, f"{method}_results_{g}.txt")
             file_data = {}
-            with open(file_path, 'r') as f:
+            with open(file_name, 'r') as f:
                 raw_lines = f.read().splitlines()
                 for line in raw_lines[1:]:
                     splitline = line.split()
@@ -52,7 +51,6 @@ def read_results(results_dir, solve_methods, Gammas):
                         file_data[instance] = {'objval': float(splitline[2]), 'objbound': float(splitline[3]),
                                                'gap': float(splitline[4]), 'runtime': float(splitline[5])}
             results_data[method][g] = file_data
-
     return results_data
 
 
@@ -186,7 +184,7 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
 
 
 if __name__ == "__main__":
-    results = read_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j10_7200/',
+    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j10_7200/',
                            ['benders', 'compact_reformulation'], [3, 5, 7])
     plot_gaps(results, ['benders', 'compact_reformulation'], [3, 5, 7],
               '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
