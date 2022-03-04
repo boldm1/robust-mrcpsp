@@ -36,6 +36,8 @@ class Benders:
         self.master_f = None
         self.master_s = None
         self.master_phi = None
+        self.master_S = None
+
         # Sub-problem model, objective value and parameters. Updated each time sub-problem is generated and solved.
         self.sub_model = None
         self.sub_objval = None
@@ -43,7 +45,7 @@ class Benders:
         self.sub_w = None
         self.sub_xi = None
 
-    def solve(self, num_threads=4, print_log=False):
+    def solve(self, num_threads=4, print_log=False, master_type='compact_base'):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
@@ -52,6 +54,8 @@ class Benders:
         :type num_threads: int
         :param print_log: Indicates whether or not to print Gurobi solve log to terminal. Defaults to False.
         :type print_log: bool
+        :param master_type: Master problem formulation to use. Either 'balouka' or 'compact'. Defaults to 'compact'.
+        :type str
         :return: Dictionary containing solution information.
         :rtype: dict
         """
@@ -60,7 +64,7 @@ class Benders:
         iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
         best_sol = {'modes': {}, 'network': [], 'flows': {}}  # dict to store x, y, f variable values of best solution
         start_time = time.perf_counter()
-        self.create_master_problem(num_threads, print_log)  # create basic master problem with no optimality cuts
+        self.create_master_problem(num_threads, print_log, master_type)
         while self.LB < self.UB:
             iteration_start = time.perf_counter()  # start timing iteration
             # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
@@ -158,11 +162,92 @@ class Benders:
         longest_path = [(e[0], e[1]) for e in T_E if self.sub_alpha[e[0], e[1]].X > 0.99]
         print("longest path:", longest_path)
 
-    def create_master_problem(self, num_threads=4, print_log=False):
+    def create_compact_master_problem(self, num_threads=4, print_log=False):
         """
         Creates Gurobi model to represent basic master problem without optimality cuts. The master problem selects job
         processing modes and resource allocations to minimise project duration under nominal job processing times. The
-        solution to the master problem provides a LB to optimal robust solution.
+        solution to the master problem provides a LB to optimal robust solution. Uses compact reformulation model
+        without uncertainty.
+
+        :param num_threads: Number of threads to use when solving. Defaults to 4.
+        :type num_threads: int
+        :param print_log: Indicates whether or not to print Gurobi solve log to terminal when the model is solved.
+            Defaults to False.
+        :type print_log: bool
+        """
+        # get instance data
+        V = self.instance.V
+        n = self.instance.n
+        E = self.instance.E
+        d = [self.instance.jobs[j].d for j in V]  # nominal durations
+        d_bar = [self.instance.jobs[j].d_bar for j in V]  # max durational deviation
+        M = [self.instance.jobs[j].M for j in V]  # available processing modes
+        # Dummy source and sink require all available resource
+        r = [[self.instance.R]] + [self.instance.jobs[j].r for j in self.instance.N] + [[self.instance.R]]
+
+        # Create model
+        model_name = '{}_benders_master'.format(self.instance.name)
+        model = gp.Model(model_name)
+        model.setParam('OutputFlag', print_log)
+        model.setParam('Threads', num_threads)
+
+        # Create variables
+        eta = model.addVar(name="eta")  # variable to represent objective value
+        S = model.addVars([i for i in V], name='S', vtype=GRB.CONTINUOUS, lb=0)
+        y = model.addVars([(i, j) for i in V for j in V], name="y",
+                          vtype=GRB.BINARY)  # y_ij = 1 if i -> j in transitive project precedence network
+        x = model.addVars([(i, m) for i in V for m in M[i]], name="x",
+                          vtype=GRB.BINARY)  # x_im = 1 if i is executed in mode m
+        f = model.addVars([(i, j, k) for i in V for j in V for k in self.instance.K_renew], name="f",
+                          vtype=GRB.CONTINUOUS, lb=0)  # f_ijk = flow from i to j of renewable resource k
+
+        # set model objective
+        model.setObjective(eta, GRB.MINIMIZE)
+
+        # Precedence constraints
+        model.addConstr(S[0, 0] == 0)
+        BigM = sum(max(d[i][m] + d_bar[i][m] for m in M[i]) for i in V)  # largest possible makespan
+        model.addConstrs(
+            S[j] - S[i] >= d[i][m] * x[i, m] - BigM * (1 - y[i, j]) for i in V for j in V for m in M[i])
+        model.addConstr(eta >= S[n + 1])
+        model.addConstrs(y[e[0], e[1]] == 1 for e in E)
+        model.addConstr(y[n + 1, n + 1] == 1)
+        # Renewable resource constraints
+        BigR = [
+            [[min(max(r[i][m][k] for m in M[i]), max(r[j][m][k] for m in M[j])) for k in self.instance.K_renew] for j in
+             V] for i in V]
+        model.addConstrs(
+            f[i, j, k] <= BigR[i][j][k] * y[i, j] for i in V for j in V if i != n + 1 if j != 0 for k in
+            self.instance.K_renew)
+        model.addConstrs(
+            gp.quicksum(f[i, j, k] for j in V if j != 0) == gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) for i in V
+            if i != n + 1 for k in self.instance.K_renew)
+        model.addConstrs(
+            gp.quicksum(f[i, j, k] for i in V if i != n + 1) == gp.quicksum(
+                r[j][m][k] * x[j, m] for m in M[j]) for j in V if j != 0 for k in self.instance.K_renew)
+        model.addConstrs(gp.quicksum(x[i, m] for m in M[i]) == 1 for i in V)
+        # Non-renewable resource constraints
+        model.addConstrs(gp.quicksum(r[i][m][k] * x[i, m] for m in M[i]) <= self.instance.R[k] for i in V for k in
+                         self.instance.K_nonrenew)
+
+        # Transitivity constraints to improve model performance.
+        model.addConstrs(y[i, j] + y[j, i] <= 1 for i in V for j in V if i != n + 1 if j != n + 1)
+        model.addConstrs(y[i, j] >= y[i, l] + y[l, j] - 1 for i in V for j in V for l in V)
+
+        # update model and variable parameters
+        self.master_model = model
+        self.master_eta = eta
+        self.master_S = S
+        self.master_y = y
+        self.master_x = x
+        self.master_f = f
+
+    def create_balouka_master_problem(self, num_threads=4, print_log=False):
+        """
+        Creates Gurobi model to represent basic master problem without optimality cuts. The master problem selects job
+        processing modes and resource allocations to minimise project duration under nominal job processing times. The
+        solution to the master problem provides a LB to optimal robust solution. Uses formulation presented in Balouka &
+        Cohen (2021).
 
         :param num_threads: Number of threads to use when solving. Defaults to 4.
         :type num_threads: int
