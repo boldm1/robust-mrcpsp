@@ -45,7 +45,7 @@ class Benders:
         self.sub_w = None
         self.sub_xi = None
 
-    def solve(self, num_threads=4, print_log=False, master_type='compact_base'):
+    def solve(self, num_threads=4, print_log=False, master_type='compact'):
         """
         Runs Benders' decomposition algorithm to solve robust MRCPSP instance. Terminates upon finding an optimal
         solution or reaching the specified time limit.
@@ -59,12 +59,20 @@ class Benders:
         :return: Dictionary containing solution information.
         :rtype: dict
         """
+        # check master type is recognised
+        if master_type not in ['balouka', 'compact']:
+            raise Exception("Specified master problem formulation type is not recognised. Must be either 'balouka' or "
+                            "'compact'. Please correct this and try again!")
+
         # Benders' decomposition algorithm
         t = 1  # iteration number
         iteration_times = []  # List to store time of each iteration. Average iteration time is reported in solution.
         best_sol = {'modes': {}, 'network': [], 'flows': {}}  # dict to store x, y, f variable values of best solution
         start_time = time.perf_counter()
-        self.create_master_problem(num_threads, print_log, master_type)
+        if master_type == 'compact':
+            self.create_compact_master_problem(num_threads, print_log)
+        elif master_type == 'balouka':
+            self.create_balouka_master_problem(num_threads, print_log)
         while self.LB < self.UB:
             iteration_start = time.perf_counter()  # start timing iteration
             # set master problem time limit to remaining algorithm time limit to prevent algorithm getting stuck in the
@@ -205,7 +213,7 @@ class Benders:
         model.setObjective(eta, GRB.MINIMIZE)
 
         # Precedence constraints
-        model.addConstr(S[0, 0] == 0)
+        model.addConstr(S[0] == 0)
         BigM = sum(max(d[i][m] + d_bar[i][m] for m in M[i]) for i in V)  # largest possible makespan
         model.addConstrs(
             S[j] - S[i] >= d[i][m] * x[i, m] - BigM * (1 - y[i, j]) for i in V for j in V for m in M[i])
