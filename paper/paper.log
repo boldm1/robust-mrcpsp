@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.11.5)  25 FEB 2022 10:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.11.5)  4 MAR 2022 09:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -323,7 +323,7 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 20.
+Package hyperref Info: Option `colorlinks' set `true' on input line 21.
  (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
  (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
@@ -337,51 +337,78 @@ Package graphics Info: Driver file: pdftex.def on input line 99.
 )
 \Gin@req@height=\dimen125
 \Gin@req@width=\dimen126
+) (/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
+ (/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2016/05/22 v1.7-166 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 67.
+\captionmargin=\dimen127
+\captionmargin@=\dimen128
+\captionwidth=\dimen129
+\caption@tempdima=\dimen130
+\caption@indent=\dimen131
+\caption@parindent=\dimen132
+\caption@hangindent=\dimen133
+)
+Package caption Info: KOMA-Script document class.
+\c@ContinuedFloat=\count118
+Package caption Info: hyperref package is loaded.
+) (/usr/share/texlive/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2016/05/22 v1.1-161 Sub-captions (AR)
+\c@subfigure=\count119
+\c@subtable=\count120
+) (/usr/share/texlive/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2016/11/25 v2.2 Span multiple rows of a table
+\multirow@colwidth=\skip67
+\multirow@cntb=\count121
+\multirow@dima=\skip68
+\bigstrutjot=\dimen134
 ) (./paper.aux)
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
 \AtBeginShipoutBox=\box30
-Package hyperref Info: Link coloring ON on input line 38.
+Package hyperref Info: Link coloring ON on input line 41.
  (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
- (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count118
+\c@section@level=\count122
 )
-LaTeX Info: Redefining \ref on input line 38.
-LaTeX Info: Redefining \pageref on input line 38.
-LaTeX Info: Redefining \nameref on input line 38.
+LaTeX Info: Redefining \ref on input line 41.
+LaTeX Info: Redefining \pageref on input line 41.
+LaTeX Info: Redefining \nameref on input line 41.
  (./paper.out) (./paper.out)
 \@outlinefile=\write3
 \openout3 = `paper.out'.
 
  (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count119
-\scratchdimen=\dimen127
+\scratchcounter=\count123
+\scratchdimen=\dimen135
 \scratchbox=\box31
-\nofMPsegments=\count120
-\nofMParguments=\count121
+\nofMPsegments=\count124
+\nofMParguments=\count125
 \everyMPshowfont=\toks20
-\MPscratchCnt=\count122
-\MPscratchDim=\dimen128
-\MPnumerator=\count123
-\makeMPintoPDFobject=\count124
+\MPscratchCnt=\count126
+\MPscratchDim=\dimen136
+\MPnumerator=\count127
+\makeMPintoPDFobject=\count128
 \everyMPtoPDFconversion=\toks21
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -395,71 +422,101 @@ Package grfext Info: Graphics extension search list:
  (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-LaTeX Font Info:    Try loading font information for U+msa on input line 51.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Try loading font information for U+msa on input line 54.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 51.
+LaTeX Font Info:    Try loading font information for U+msb on input line 54.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 51.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 54.
  (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 51.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 54.
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 51.
-
-./paper.tex:66: Missing { inserted.
-<to be read again> 
-                   _
-l.66 ...ource $k\in K$ has an availability of $R^_
-                                                  {k}$ at each time period i...
-A left brace was mandatory here, so I've put one in.
-You might want to delete and/or insert some corrections
-so that I will find a matching right brace soon.
-(If you're confused by all this, try typing `I}' now.)
-
-./paper.tex:66: Missing } inserted.
-<inserted text> 
-                }
-l.66 ...e $k\in K$ has an availability of $R^_{k}$
-                                                   at each time period in th...
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-[1
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 54.
+ [1
 
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] (./paper.bbl [4])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 127.
- [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 127.
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+<figures/mrcpsp_network.pdf, id=69, 364.06609pt x 227.18375pt>
+File: figures/mrcpsp_network.pdf Graphic file (type pdf)
+<use figures/mrcpsp_network.pdf>
+Package pdftex.def Info: figures/mrcpsp_network.pdf  used on input line 75.
+(pdftex.def)             Requested size: 364.06519pt x 227.18317pt.
+ [2 <./figures/mrcpsp_network.pdf>] [3] [4] [5] [6] [7]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figures/j10_performance_profile.pdf, id=212, 462.52798pt x 346.89601pt>
+File: figures/j10_performance_profile.pdf Graphic file (type pdf)
+<use figures/j10_performance_profile.pdf>
+Package pdftex.def Info: figures/j10_performance_profile.pdf  used on input line 254.
+(pdftex.def)             Requested size: 285.45755pt x 214.10464pt.
+
+Overfull \hbox (13.594pt too wide) in paragraph at lines 254--254
+ [][] 
+ []
+
+<figures/j10_gaps.pdf, id=213, 462.52798pt x 346.89601pt>
+File: figures/j10_gaps.pdf Graphic file (type pdf)
+<use figures/j10_gaps.pdf>
+Package pdftex.def Info: figures/j10_gaps.pdf  used on input line 254.
+(pdftex.def)             Requested size: 285.45755pt x 214.10464pt.
+
+Overfull \hbox (13.594pt too wide) in paragraph at lines 254--254
+ [][] 
+ []
+
+<figures/j20_performance_profile.pdf, id=214, 462.52798pt x 346.89601pt>
+File: figures/j20_performance_profile.pdf Graphic file (type pdf)
+<use figures/j20_performance_profile.pdf>
+Package pdftex.def Info: figures/j20_performance_profile.pdf  used on input line 271.
+(pdftex.def)             Requested size: 285.45755pt x 214.10464pt.
+
+Overfull \hbox (13.594pt too wide) in paragraph at lines 271--271
+ [][] 
+ []
+
+<figures/j20_gaps.pdf, id=215, 462.52798pt x 346.89601pt>
+File: figures/j20_gaps.pdf Graphic file (type pdf)
+<use figures/j20_gaps.pdf>
+Package pdftex.def Info: figures/j20_gaps.pdf  used on input line 271.
+(pdftex.def)             Requested size: 285.45755pt x 214.10464pt.
+
+Overfull \hbox (13.594pt too wide) in paragraph at lines 271--271
+ [][] 
+ []
+
+(./paper.bbl [8])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 285.
+ [9] [10 <./figures/j10_performance_profile.pdf> <./figures/j10_gaps.pdf> <./figures/j20_performance_profile.pdf> <./figures/j20_gaps.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 285.
  (./paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 127.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 127.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 285.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 285.
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: 9C5AE92558835C3E29882DAC5438900E;345.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 127.
+(rerunfilecheck)             Checksum: 3063E29EA0891789347D68B3A0E900F2;596.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 285.
  ) 
 Here is how much of TeX's memory you used:
- 9489 strings out of 492982
- 147086 string characters out of 6134896
- 335442 words of memory out of 5000000
- 12899 multiletter control sequences out of 15000+600000
- 22577 words of font info for 83 fonts, out of 8000000 for 9000
+ 10727 strings out of 492982
+ 169897 string characters out of 6134896
+ 364248 words of memory out of 5000000
+ 14071 multiletter control sequences out of 15000+600000
+ 23385 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,10n,51p,8816b,342s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (5 pages, 204169 bytes).
+ 42i,12n,51p,8816b,529s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on paper.pdf (10 pages, 341665 bytes).
 PDF statistics:
- 181 PDF objects out of 1000 (max. 8388607)
- 153 compressed objects within 2 object streams
- 37 named destinations out of 1000 (max. 500000)
- 49 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 361 PDF objects out of 1000 (max. 8388607)
+ 315 compressed objects within 4 object streams
+ 84 named destinations out of 1000 (max. 500000)
+ 106 words of extra memory for PDF output out of 10000 (max. 10000000)
 

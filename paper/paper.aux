@@ -23,15 +23,18 @@
 \citation{balouka2021robust}
 \citation{bruni2017adjustable}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Problem description}{2}{section.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Example of an uncertain MRCPSP instance involving five non-dummy activities and a single renewable resource with an availability of 4. Activities 2 and 5 each have two available processing modes, whilst the other activities have only a single mode.\relax }}{2}{figure.caption.1}}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:mrcpsp_network}{{1}{2}{Example of an uncertain MRCPSP instance involving five non-dummy activities and a single renewable resource with an availability of 4. Activities 2 and 5 each have two available processing modes, whilst the other activities have only a single mode.\relax }{figure.caption.1}{}}
 \citation{bertsimas2004price}
 \citation{bartusch1988scheduling}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Problem description}{2}{section.2}}
 \citation{bold2021compact}
 \newlabel{eqn:robust_mrcpsp_1}{{1}{3}{Problem description}{equation.2.1}{}}
 \newlabel{eqn:robust_mrcpsp_4}{{4}{3}{Problem description}{equation.2.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}A compact reformulation}{3}{section.3}}
 \citation{balouka2021robust}
-\bibdata{paper}
+\citation{bruni2017adjustable}
 \newlabel{eqn:compact1}{{5}{4}{A compact reformulation}{equation.3.5}{}}
 \newlabel{eqn:compact2}{{6}{4}{A compact reformulation}{equation.3.6}{}}
 \newlabel{eqn:compact_bigM1}{{7}{4}{A compact reformulation}{equation.3.7}{}}
@@ -45,10 +48,51 @@
 \newlabel{eqn:compact11}{{16}{4}{A compact reformulation}{equation.3.16}{}}
 \newlabel{eqn:compact12}{{17}{4}{A compact reformulation}{equation.3.17}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}A Benders' decomposition approach}{4}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}The master problem}{5}{subsection.4.1}}
+\newlabel{eqn:master_first}{{19}{5}{The master problem}{equation.4.19}{}}
+\newlabel{eqn:master_y1}{{20}{5}{The master problem}{equation.4.20}{}}
+\newlabel{eqn:master_y2}{{21}{5}{The master problem}{equation.4.21}{}}
+\newlabel{eqn:master_y3}{{22}{5}{The master problem}{equation.4.22}{}}
+\newlabel{eqn:master_f1}{{23}{5}{The master problem}{equation.4.23}{}}
+\newlabel{eqn:master_f2}{{24}{5}{The master problem}{equation.4.24}{}}
+\newlabel{eqn:master_f3}{{25}{5}{The master problem}{equation.4.25}{}}
+\newlabel{eqn:master_x}{{26}{5}{The master problem}{equation.4.26}{}}
+\newlabel{eqn:master_nonrenewable}{{27}{5}{The master problem}{equation.4.27}{}}
+\newlabel{eqn:master_cuts}{{28}{5}{The master problem}{equation.4.28}{}}
+\newlabel{eqn:master_relaxation1_1}{{29}{5}{The master problem}{equation.4.29}{}}
+\newlabel{eqn:master_relaxation1_2}{{30}{5}{The master problem}{equation.4.30}{}}
+\newlabel{eqn:master_relaxation2_1}{{31}{5}{The master problem}{equation.4.31}{}}
+\citation{bruni2017adjustable}
+\citation{balouka2021robust}
+\newlabel{eqn:master_relaxation2_5}{{35}{6}{The master problem}{equation.4.35}{}}
+\newlabel{eqn:master_last}{{40}{6}{The master problem}{equation.4.40}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}The subproblem}{6}{subsection.4.2}}
+\citation{balouka2021robust}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Optimality cuts}{7}{subsection.4.3}}
+\newlabel{section:optimality_cuts}{{4.3}{7}{Optimality cuts}{subsection.4.3}{}}
+\newlabel{eqn:benders_cut}{{51}{7}{Optimality cuts}{equation.4.51}{}}
+\citation{kolisch1997psplib}
+\bibdata{paper}
 \bibcite{balouka2021robust}{{1}{2021}{{Balouka and Cohen}}{{}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Example}{8}{subsection.4.4}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Computational experiments and results}{8}{section.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions}{8}{section.6}}
 \bibcite{bartusch1988scheduling}{{2}{1988}{{Bartusch et~al.}}{{}}}
 \bibcite{bertsimas2004price}{{3}{2004}{{Bertsimas and Sim}}{{}}}
 \bibcite{bold2021compact}{{4}{2021}{{Bold and Goerigk}}{{}}}
 \bibcite{bruni2017adjustable}{{5}{2017}{{Bruni et~al.}}{{}}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Computational experiments and results}{5}{section.5}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions}{5}{section.6}}
+\bibcite{kolisch1997psplib}{{6}{1997}{{Kolisch and Sprecher}}{{}}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparison of the Benders' decomposition approach and the compact reformulation across the $j10$ and $j20$ instance sets and the different values of $\Gamma $.\relax }}{9}{table.caption.2}}
+\newlabel{table:benders_vs_compact}{{1}{9}{Comparison of the Benders' decomposition approach and the compact reformulation across the $j10$ and $j20$ instance sets and the different values of $\Gamma $.\relax }{table.caption.2}{}}
+\newlabel{fig:j10_performance_profile}{{2a}{10}{Performance profile of relative solution times.\relax }{figure.caption.3}{}}
+\newlabel{sub@fig:j10_performance_profile}{{a}{10}{Performance profile of relative solution times.\relax }{figure.caption.3}{}}
+\newlabel{fig:j10_gaps}{{2b}{10}{Percentage of instances solved to within given gap of optimality within the two-hour time limit.\relax }{figure.caption.3}{}}
+\newlabel{sub@fig:j10_gaps}{{b}{10}{Percentage of instances solved to within given gap of optimality within the two-hour time limit.\relax }{figure.caption.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Comparison of Benders' approach and compact reformulation over instances in the j10 set.\relax }}{10}{figure.caption.3}}
+\newlabel{fig:j10_plots}{{2}{10}{Comparison of Benders' approach and compact reformulation over instances in the j10 set.\relax }{figure.caption.3}{}}
+\newlabel{fig:j20_performance_profile}{{3a}{10}{Performance profile of relative solution times.\relax }{figure.caption.4}{}}
+\newlabel{sub@fig:j20_performance_profile}{{a}{10}{Performance profile of relative solution times.\relax }{figure.caption.4}{}}
+\newlabel{fig:j20_gaps}{{3b}{10}{Percentage of instances solved to within given gap of optimality within the two-hour time limit.\relax }{figure.caption.4}{}}
+\newlabel{sub@fig:j20_gaps}{{b}{10}{Percentage of instances solved to within given gap of optimality within the two-hour time limit.\relax }{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Comparison of Benders' approach and compact reformulation over instances in the j20 set.\relax }}{10}{figure.caption.4}}
+\newlabel{fig:j20_plots}{{3}{10}{Comparison of Benders' approach and compact reformulation over instances in the j20 set.\relax }{figure.caption.4}{}}
