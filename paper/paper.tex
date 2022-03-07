@@ -11,6 +11,13 @@
 \usepackage{amssymb}
 \usepackage{bm}
 
+% algorithm presentation
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\algnewcommand{\Initialise}[1]{%
+	\State \textbf{Initialise:}\space\parbox[t]{.8\linewidth}{\raggedright #1}
+}
+
 % bibliography and referencing
 \usepackage{natbib}
 \bibliographystyle{apalike}
@@ -29,6 +36,7 @@
 % layout and formatting
 \allowdisplaybreaks  % allows page breaks within equations
 \usepackage{multirow}  % table formatting
+\usepackage{verbatim}  % allows blocks to be commented out
 
 % macros
 \newcommand{\F}{{\mathcal{F}}}
@@ -60,67 +68,75 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
-The multi-mode resource-constrained project scheduling problem (MRCPSP) is a generalisation of the widely-studied resource-constrained project scheduling problem (RCPSP) to include multiple processing modes for each activity. The purpose of introducing activity processing modes is to model situations in which there is more than one way of executing project activities, with each option having its own duration and resource requirements. The MRCPSP consists selecting the processing modes and start times for a given set of activities, subject to a set of precedence constraints and limited resource availability, with the objective of minimising the overall project duration, known as the makespan.
+The multi-mode resource-constrained project scheduling problem (MRCPSP) is a generalisation of the widely-studied resource-constrained project scheduling problem (RCPSP) to include multiple processing modes for each activity. The inclusion of these modes is to model situations in which there is more than one way of executing project activities, with each option having its own duration and resource requirements. The MRCPSP consists selecting the processing modes and start times for a given set of activities, subject to a set of precedence constraints and limited resource availability, with the objective of minimising the overall project duration, known as the makespan.
 
-The work in the paper extends the compact reformulation for the RCPSP developed by \cite{bold2021compact} for application to the MRCPSP. A computational study is presented comparing this approach against the Benders' decomposition approach used in \cite{balouka2021robust} for solving MRCPSP instances with uncertain activity durations. Note that the method used in \cite{balouka2021robust} is an extension of the approach used by \cite{bruni2017adjustable} to solve the RCPSP with uncertain activity durations.
+In this paper we consider the MRCPSP under uncertain activity durations and model it using a two-stage adjustable robust optimisation framework. In this setting, a first-stage problem is solved to determine activity mode selections and make activity sequencing decisions to resolve resource conflicts. Following this, the actual activity durations are realised and a complete schedule is computed. The aim of the two-stage robust MRCPSP is to find a feasible first-stage solution (i.e. mode selection and sequencing decisions) in order to minimise the realised worse-case makespan, as computed in the second-stage. We refer to this problem as the robust MRCPSP.
 
-* lit review *
+In recent years this two-stage robust optimisation approach has been applied to the RCPSP. First to use this approach were \cite{artigues2013robust}, who present an iterative scenario-relaxation algorithm for this problem with the objective of minimising the worst-case absolute regret. \cite{bruni2017adjustable} propose a Benders'-style decomposition approach for solving the robust RCPSP with the objective of minimising the worst-case project makespan. This work was extended in \cite{bruni2018computational}, which presents a computational study comparing an additional Benders' decomposition approach against a primal decomposition algorithm. Recently, \cite{bold2021compact} introduced a compact reformulation of the robust RCPSP and presented results which showed the superiority of that formulation over the iterative methods developed in those papers. 
+
+The application of the this two-stage robust optimisation approach for the MRCPSP is a more recently development. To the best of our knowledge, the only existing paper to consider this problem is \cite{balouka2021robust}, in which the Benders' decomposition approach used by \cite{bruni2017adjustable} for the robust RCPSP has been extended for application to the MRCPSP. Analogous to that work, the aim of this paper is to apply the compact reformulation first developed for the RCPSP by \cite{bold2021compact} to the MRCPSP. Specifically, we present a computational comparison of our compact reformulation approach and a strengthened version of the Benders' decomposition approach.
 
 \section{Problem description}
 
-A project consists of a set of non-preemptive activities $V=\{0,1,\dots,n,n+1\}$, where 0 and $n+1$ denote the dummy source and sink activities respectively. Each activity $i\in V$ has a set of available processing modes given by $M_i=\{1,\dots,|M_i|\}$. We denote a particular choice of mode selections as $\bm{m}=(m_1,\dots,m_n)$, and the set of all possible mode selections by $\M\subseteq \mathbb{N}^n$. The nominal duration of activity $i$ when executed in mode $m_i\in M_i$ is given by $\hat{d}_{im_i}$, whilst its worst-case duration is given by $\bar{d}_{im_i}+\hat{d}_{im_i}$, where $\hat{d}_{im_i}$ is its maximum durational deviation. Each mode for activity $i$, $m_i\in M_i$, has an associated renewable resource requirement of $r_{im_ik}$ for each $k\in K$, where $K$ is the set of renewable resource types involved in the project. Each renewable resource $k\in K$ has an availability of $R_{k}$ at each time period in the project horizon. As well as resource constraints, the project is subject to a set of strict finish-to-start precedence constraints given by $E$, where $(i,j)\in E$ enforces that activity $i$ must finish before activity $j$ can begin. A project can be represented on a directed graph $G(V,E)$. Figure \ref{fig:mrcpsp_network} shows an example uncertain MRCPSP instance involving five non-dummy activities and a single renewable resource.
+A project consists of a set of non-preemptive activities $V=\{0,1,\dots,n,n+1\}$, where 0 and $n+1$ denote the dummy source and sink activities respectively. Each activity $i\in V$ has a set of available processing modes given by $M_i=\{1,\dots,|M_i|\}$. The nominal duration of activity $i$ when executed in mode $m_i\in M_i$ is given by $\bar{d}_{im_i}$, whilst its worst-case duration is given by $\bar{d}_{im_i}+\hat{d}_{im_i}$, where $\hat{d}_{im_i}$ is its maximum durational deviation. Each mode for activity $i$, $m_i\in M_i$, has an associated renewable resource requirement of $r_{im_ik}$ for each $k\in K$, where $K$ is the set of renewable resource types involved in the project. Each renewable resource $k\in K$ has an availability of $R_{k}$ at each time period in the project horizon. As well as renewable resource requirements, mode $m_i$ of activity $i$ also has a non-renewable resource requirement of $r^{'}_{im_ik}$ for each non-renewable resource type $k\in K^{'}$, with each non-renewable resource having an overall availability of $R^{'}_k$ for the entire project horizon. Additionally, the project is subject to a set of strict finish-to-start precedence constraints given by $E$, where $(i,j)\in E$ enforces that activity $i$ must finish before activity $j$ can begin. These form a project network that can be represented using a directed graph $G(V,E)$. Figure \ref{fig:mrcpsp_network} shows an example instance involving five non-dummy activities and a single renewable resource.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=1]{mrcpsp_network.pdf}
-	\caption{Example of an uncertain MRCPSP instance involving five non-dummy activities and a single renewable resource with an availability of 4. Activities 2 and 5 each have two available processing modes, whilst the other activities have only a single mode.}
+	\caption{An example instance involving five non-dummy activities and a single renewable resource. Activities 2 and 5 each have two available processing modes, whilst the other activities have only a single mode.}
 	\label{fig:mrcpsp_network}
 \end{figure}
 
-
-For a given choice of processing modes for each activity $\bm{m}$, we assume that the activity durations lie somewhere in a budgeted uncertainty set of the form
+For a given choice of processing modes for each activity $\bm{m}=(m_1,\dots,m_n)$, we assume that the activity durations lie somewhere in a budgeted uncertainty set of the form
 $$\U_{\bm{m}}(\Gamma)=\Bigg\{\bm{d}\in\mathbb{R}_+^{|V|}:d_{im_i}=\bar{d}_{im_i}+\xi_i\hat{d}_{im_i},\,0\leq \xi_i \leq 1,\,\forall i\in V,\,\sum_{i\in V}\xi_i \leq \Gamma\Bigg\}.$$
 Introduced by \cite{bertsimas2004price}, the motivation of the budgeted uncertainty set is to control the pessimism of the solution by introducing a robustness parameter $\Gamma$ to limit the number of jobs that can simultaneously achieve their worst-case durations. Observe that when $\Gamma=0$, each activity takes its nominal duration and the resulting problem is the deterministic MRCPSP. At the other extreme, when $\Gamma=n$, every activity takes its worst-case duration, in which case the uncertainty set becomes equivalent to an interval uncertainty set. In this case the problem can again be solved as a deterministic MRCPSP instance considering only worst-case durations.
 
-For a given selection of activity modes $\bm{m}$, a forbidden set is defined to be any subset of activities $F_{\bm{m}}\subseteq V$ that are not precedence-related, such that $\sum_{i\in F_{\bm{m}}}r_{im_ik}>R_k$ for at least one resource $k\in K$. That is, a forbidden set is a collection of activities that cannot be executed in parallel only because of resource limitations.
+For a given set of activity modes $\bm{m}$, a forbidden set is defined to be any subset of activities $F_{\bm{m}}\subseteq V$ that are not precedence-related, such that $\sum_{i\in F_{\bm{m}}}r_{im_ik}>R_k$ for at least one resource $k\in K$. That is, a forbidden set is a collection of activities that cannot be executed in parallel only because of resource limitations.
 
-Applying the main representation theorem of \cite{bartusch1988scheduling}, given a particular choice of activity modes $\bm{m}$, a solution to the MRCPSP can be defined by a set of additional precedences $X_{\bm{m}}\subseteq V^2\setminus E$ such that the extended precedence network $G(V,E\cup X_{\bm{m}})$ is acyclic and contains no forbidden sets. Such an extension to the project network is referred to as a \textit{sufficient selection}. 
+Applying the main representation theorem of \cite{bartusch1988scheduling}, for a particular choice of activity modes $\bm{m}$, a solution to the MRCPSP can be defined by a set of additional precedences $X_{\bm{m}}\subseteq V^2\setminus E$ such that the extended precedence network $G(V,E\cup X_{\bm{m}})$ is acyclic and contains no forbidden sets. Such an extension to the project network is referred to as a \textit{sufficient selection}.
 
 Hence the two-stage robust MRCPSP under budgeted uncertainty, which we refer to as the robust MRCPSP, can be written as
 \begin{align}
-	& \min_{\bm{m}\in \M,\,X_{\bm{m}}\in \X_{\bm{m}}} \max_{\bm{d}\in\U_{\bm{m}}(\Gamma)} \min_{\bm{S}} S_{n+1}\label{eqn:robust_mrcpsp_1}\\
+	& \min_{\bm{m}\in \M,\,X_{\bm{m}}\in \X_{\bm{m}}} \max_{\bm{d}\in\U_{\bm{m}}(\Gamma)} \min S_{n+1}\label{eqn:robust_mrcpsp_1}\\
 	& S_0 = 0\\
 	& S_j - S_i \geq d_{im_i} \qquad \forall (i,j)\in E\cup X_{\bm{m}}\\
-	& S_i \geq 0 \qquad \forall i\in V.\label{eqn:robust_mrcpsp_4}
+	& S_i \geq 0 \qquad \forall i\in V,\label{eqn:robust_mrcpsp_4}
 \end{align}
-This problem aims to selects activity modes and a corresponding sufficient selection in order to minimise the worst-case project makespan. 
+where $\M\subseteq \mathbb{N}^n$ represents the set of all possible combinations of activity processing mode selections, and $\X_{\bm{m}}$ is the set of all possible sufficient selections for the choice of processing modes given by $\bm{m}$. This problem aims to selects activity modes and a corresponding sufficient selection in order to minimise the worst-case project makespan. 
 
-\section{A compact reformulation}
+\section{A compact formulation}
 
-We propose solving this problem using an extended version of the compact reformulation from \cite{bold2021compact}. The development of this formulation for the RCPSP involved a reformulation of the adversarial sub-problem of determining the worst-case distribution of $\Gamma$ delays among the project activities. The reformulated sub-problem took the form of a longest-path problem through an augmented project network. 
+We propose solving this problem using an extended version of the compact formulation developed by \cite{bold2021compact} for solving the robust RCPSP. This formulation combines the first and second-stage problems into a single compact formulation and was shown to significantly outperform the strongest iterative decompostion-based methods for the robust RCPSP.
 
-The derivation for the equivalent compact reformulation for the MRCPSP is more or less identical to the one presented in that paper for the RCPSP. We therefore omit its derivation here, and instead just present the resulting model.
+This formulation is constructed by recasting the adversarial subproblem of determining the worst-case activity durations for a given set of mode choices and sufficient selection as a longest path problem on an augmented project network. This augmented project network is formed of $\Gamma+1$ connected copies of the original project network, with each level being used to account for a delay to a single activity in the project. Having reformulated the adversarial subproblem as a longest-path problem, it can be dualised an inserted into a formulation for the full problem, to arrive at a complete compact formulation for the first-stage problem. Given that the derivation of this formulation for the MRCPSP is more or less identical to the derivation for the RCPSP, we omit it here and refer the reader to \cite{bold2021compact}.
 
+The resulting compact formulation for the two-stage adjustable robust MRCPSP can be written as
 \begin{align}
 \min \ & S_{n+1,\Gamma}\label{eqn:compact1}\\
 \text{s.t. } & S_{00}=0\label{eqn:compact2}\\
-	     & S_{j\gamma} - S_{i\gamma} \geq \bar{d}_{im}x_{im} - N(1-y_{ij}) & \hspace{-5cm}\forall (i,j)\in V^2,\,\forall m\in M_i,\,\gamma=0,\dots,\Gamma\label{eqn:compact_bigM1}\\
+	     & S_{j\gamma} - S_{i\gamma} \geq \bar{d}_{im}x_{im} - N(1-y_{ij}) \qquad \forall (i,j)\in V^2,\,\forall m\in M_i,\,\gamma=0,\dots,\Gamma\label{eqn:compact_bigM1}\\
 	     & S_{j,\gamma+1} - S_{i\gamma} \geq (\bar{d}_{im} + \hat{d}_{im})x_{im} - N(1-y_{ij})\nonumber \\
-	     &&\hspace{-5cm} \forall (i,j)\in V^2,\, m\in M_i,\,\gamma = 0,\dots,\Gamma-1\label{eqn:compact_bigM2}\\
-	     & y_{ij}=1 & \forall (i,j) \in E\cup\{(n+1,n+1)\}\label{eqn:compact5}\\
-	     & f_{ijk}\leq P_{ijk}y_{ij} & \hspace{-5cm}\forall (i,j)\in V^2,\,i\neq n+1,\,j\neq0,\, \forall k \in K\label{eqn:compact6}\\
-	     & \sum_{i\in V\setminus\{n+1\}}f_{ijk}=\sum_{m\in M_j}r_{jmk}x_{jm} & \forall j \in V\setminus\{0\} ,\, \forall k\in K\label{eqn:compact7}\\
-	     & \sum_{j\in V\setminus\{0\}}f_{ijk}=\sum_{m\in M_i}r_{imk}x_{im} & \forall i \in V\setminus\{n+1\},\,\forall k\in K\label{eqn:compact8}\\
-	     & \sum_{m\in M_i}x_{im} = 1 & \forall i\in V\label{eqn:compact9}\\
-	     & \sum_{m\in M_i}r^{\nu}_{imk}x_{im} \leq R^{\nu}_k & \forall i \in V,\,k\in K^{\nu}\\
-	     & S_{i\gamma}\geq 0 &\forall i\in V,\,\gamma \in 0,\dots, \Gamma\label{eqn:compact10}\\
-	     & f_{ijk}\geq 0 & \forall (i,j)\in V^2 ,\, \forall k \in K\label{eqn:compact11}\\
-	     & y_{ij}\in\{0,1\} & \forall (i,j)\in V^2\label{eqn:compact12}\\
-	     & x_{im}\in\{0,1\} & \forall i\in V,\,m\in M_i,
+	     & & \hspace{-8cm} \forall (i,j)\in V^2,\, m\in M_i,\,\gamma = 0,\dots,\Gamma-1\label{eqn:compact_bigM2}\\
+	     & y_{ij}=1 \qquad \forall (i,j) \in E\cup\{(n+1,n+1)\}\label{eqn:compact5}\\
+	     & y_{ij} + y_{ji} \leq 1 \qquad \forall i,j\in V,\, i<j\label{eqn:compact_trans1}\\
+	     & y_{ij} = y_{ip} + y_{p j} - 1 \qquad \forall i,j,p\in V,\,i\neq j\neq p\label{eqn:compact_trans2}\\
+	     & f_{ijk}\leq P_{ijk}y_{ij} \qquad \forall (i,j)\in V^2,\,i\neq n+1,\,j\neq0,\, \forall k \in K\label{eqn:compact6}\\
+	     & \sum_{i\in V\setminus\{n+1\}}f_{ijk}=\sum_{m\in M_j}r_{jmk}x_{jm} \qquad \forall j \in V\setminus\{0\} ,\, \forall k\in K\label{eqn:compact7}\\
+	     & \sum_{j\in V\setminus\{0\}}f_{ijk}=\sum_{m\in M_i}r_{imk}x_{im} \qquad \forall i \in V\setminus\{n+1\},\,\forall k\in K\label{eqn:compact8}\\
+	     & \sum_{m\in M_i}x_{im} = 1 \qquad \forall i\in V\label{eqn:compact9}\\
+	     & \sum_{m\in M_i}r^{'}_{imk}x_{im} \leq R^{'}_k \qquad \forall i \in V,\,k\in K^{'}\label{eqn:compact_nonrenewable}\\
+	     & S_{i\gamma}\geq 0 \qquad \forall i\in V,\,\gamma \in 0,\dots, \Gamma\label{eqn:compact10}\\
+	     & f_{ijk}\geq 0 \qquad \forall (i,j)\in V^2 ,\, \forall k \in K\label{eqn:compact11}\\
+	     & y_{ij}\in\{0,1\} \qquad \forall (i,j)\in V^2\label{eqn:compact12}\\
+	     & x_{im}\in\{0,1\} \qquad \forall i\in V,\,m\in M_i\label{eqn:compact13},
 \end{align}
 where $N=\sum_{i\in V}\max_{m\in M_i}(\bar{d}_{im}+\hat{d}_{im})$ is an upper bound on the minimum makespan, and $P_{ijk}=\min\{\max_{m\in M_i}r_{imk},\,\max_{m\in M_j} r_{jmk}\}$ is the maximum possible flow of resource $k$ from $i$ into $j$.
 
-This formulation can be solved directly by a standard mathematical optimisation solver such as Gurobi or CPLEX.
+Constraints (\ref{eqn:compact2})-(\ref{eqn:compact_bigM2}) are the dual constraints corresponding to the longest-path variables in the adversarial subproblem, and serve to ensure that the activity start times respect the project precedences as well as any delays to activity durations. Constraints (\ref{eqn:compact5}) capture the original project precedence relationships. Although not required for the correctness of the model, constraints (\ref{eqn:compact_trans1}) and (\ref{eqn:compact_trans2}) are additional transitivity constraints that have been included because they were shown in \cite{bold2021compact} to provide significant improvements to the computational performance of the model. Constraints (\ref{eqn:compact6})-(\ref{eqn:compact8}) are resource flow constraints which ensure that the transfer of resources between activities follows precedence constraints and that resources are conserved as they flow into and out of each activity in the network. Constraints (\ref{eqn:compact9}) allows only one processing mode to be selected for each activity. Finally, non-renewable resource constraints are enforced by (\ref{eqn:compact_nonrenewable}).
+
+
+
+With polynomially many constraints this formulation can be implemented straightforwardly using standard mathematical optimisation software such as Gurobi or CPLEX.
 
 \section{A Benders' decomposition approach}
 
@@ -131,6 +147,18 @@ The main idea behind this approach is to decompose the full problem into a two s
 \subsection{The master problem}
 
 The role of the master problem is to determine a choice of activity processing modes $\bm{m}$, as well as a sufficient selection $X_{\bm{m}}$ to resolve any resulting resource conflicts. The processing mode for each activity is determined by binary variables $x_{im}$. The $y_{ij}$ variables define a complete set of precedences between the project activities, either due to the original project precedence constraints, or due to the resolution of resource conflicts, i.e. $\{(i,j),\, i,j\in V:y_{ij}=1\}=T(E\cup X_{\bm{m}})$, where $T(E\cup X_{\bm{m}})$ is the transitive closure of the extended project precedence network. Resource flow variables $f_{ijk}$ track the amount of renewable resource $k$ that is transferred from activity $i$ to activity $j$ upon its completion. Finally, $s_i$ and $\phi_{ij}$ are additional variables used to define two relaxations of the subproblem to strengthen the master problem formulation. Using these variables, the master problem can be formulated as follows:  
+\begin{align}
+\min \ & \eta\label{eqn:master_first}\\
+\text{s.t. } & \eta \geq S_{n+1}\\
+	     & S_{0}=0\label{eqn:master2}\\
+	     & S_{j} - S_{i} \geq \bar{d}_{im}x_{im} - N(1-y_{ij}) \qquad \forall (i,j)\in V^2,\,\forall m\in M_i\label{eqn:master3}\\
+	     & \textnormal{(\ref{eqn:compact5})-(\ref{eqn:compact_nonrenewable}),\,(\ref{eqn:compact11})-(\ref{eqn:compact13})}\\
+	     & S_i\geq 0 \qquad \forall i\in V\label{eqn:master_last}
+\end{align}
+
+
+
+\begin{comment}
 \begin{align}
 	& \min \eta\label{eqn:master_first}\\
 	& y_{ij} = 1 \qquad \forall (i,j)\in E \label{eqn:master_y1}\\
@@ -158,6 +186,7 @@ The role of the master problem is to determine a choice of activity processing m
 	& \phi_{ij} \geq 0 \qquad \forall i,j\in V \label{eqn:master_last}
 \end{align}
 where $\bar{r}_{ijk}=\max(\max_{m\in M_i}r_{imk},\,\max_{m\in M_j}r_{jmk})$ is the maximum usage of resource $k\in K$ by either activity $i$ or $j$, and as before, $N=\sum_{i\in V}\max_{m\in M_i}(\bar{d}_{im}+\hat{d}_{im})$ is an upper bound on the minimum makespan.
+\end{comment}
 
 The solution to he optimal objective value of the master problem (\ref{eqn:master_first})-(\ref{eqn:master_last}), denoted by $\eta^*$, forms a lower bound to the original robust MRCPSP problem. Note that for the first iteration, the solution to the master problem corresponds to an optimal solution to the MRCPSP with nominal activity durations. 
 
@@ -169,7 +198,7 @@ In line with \cite{bruni2017adjustable} and \cite{balouka2021robust}, two relaxa
  
 The subproblem at iteration $t$ considers the worst-case makespan for the mode choices and sufficient selection from the master problem at iteration $t$, denoted by $\bm{m}^{*t}$ and $X_{\bm{m}^{*t}}$ respectively. This is done by solving an uncertain longest-path problem through the extended project network, where activity durations lie in the budgeted uncertainty set $\U_{\bm{m}^{*t}}(\Gamma)$. This problem can be formulated as 
 \begin{align}
-V^{*t} = &\max \sum_{(i,j)\in T(E\cup X_{\bm{m}^{*t}})} \bar{d}_{im^{*t}_i}\alpha_{ij} + \hat{d}_{im^{*t}_i}w_{ij}\\
+	V^{*t} = &\max \sum_{(i,j)\in T(E\cup X_{\bm{m}^{*t}})} \bar{d}_{im^{*t}_i}\alpha_{ij} + \hat{d}_{im^{*t}_i}w_{ij}\label{eqn:subproblem_first}\\
 	& \sum_{(i,n+1)\in T(E\cup X_{\bm{m}^{*t}})} \alpha_{i,n+1} = 1\\
 	& \sum_{(0,i)\in T(E\cup X_{\bm{m}^{*t}})} \alpha_{0,i} = 1\\
 	& \sum_{(i,j)\in T(E\cup X_{\bm{m}^{*t}})} \alpha_{ij} - \sum_{(j,i)\in T(E\cup X_{\bm{m}^{*t}})} \alpha_{ji} = 0 \qquad \forall i \in V\setminus\{0,n+1\}\\
@@ -178,7 +207,7 @@ V^{*t} = &\max \sum_{(i,j)\in T(E\cup X_{\bm{m}^{*t}})} \bar{d}_{im^{*t}_i}\alph
 	& \sum_{i\in V}\xi_i \leq \Gamma\\
 	& \alpha_{ij}\in \{0,1\} \qquad \forall (i,j)\in T(E\cup X_{\bm{m}^{*t}})\\
 	& w_{ij}\geq 0 \qquad \forall (i,j)\in T(E\cup X_{\bm{m}^{*t}})\\
-	& 0\leq \xi_i \leq 1 \qquad \forall i\in V
+	& 0\leq \xi_i \leq 1 \qquad \forall i\in V \label{eqn:subproblem_last}
 \end{align}
 
 Variables $\alpha_{ij}$ define the longest path through the network. This path, which we denote as $\pi^{*t}=\{(i,j),\,i,j\in V:\alpha_{ij}=1\}$ has length $V^{*t}$. Variables $\xi_i$ are the activity delay variables, whilst $w_{ij}$ are used to linearise the formulation.
@@ -195,9 +224,48 @@ Given the current best lower bound for the original problem $LB$, the mode selec
 
 \cite{balouka2021robust} show that this constraint is a valid optimality cut for the problem, and that the number of these cuts that need to be added to the master problem before finding an optimal solution is finite.
 
-Before presenting a small example of the Benders' decomposition approach in the following subsection, we show an overview of the solution method in /ref. 
+
+\begin{algorithm}[h] 
+\caption{Benders' decomposition algorithm}
+\begin{algorithmic}[1]
+\Initialise{Set $LB=-\infty$, $UB=+\infty$ and $t=1$.}
+\While{$UB > LB$}
+	\State \textbf{Solve master problem (\ref{eqn:master_first})-(\ref{eqn:master_last})} 
+	\State \hspace{\algorithmicindent} Get objective value $\eta^{*t}$, processing modes $\bm{m^{*t}}$ and precedences $\bm{y}_{\bm{m}^{*t}}$.
+	\State \hspace{\algorithmicindent} If $\eta^{*t}>LB$, update $LB\leftarrow \eta^{*t}$ 
+	\State \textbf{Solve subproblem (\ref{eqn:subproblem_first})-(\ref{eqn:subproblem_last})}
+	\State \hspace{\algorithmicindent} Get objective value $V^{*t}$ and longest path $\pi^{*t}$
+	\State \hspace{\algorithmicindent} If $V^{*t}<UB$, update $UB\leftarrow V^{*t}$
+	\State \textbf{Add cut (\ref{eqn:benders_cut}) to master problem}
+	\State Update $t\leftarrow t+1$
+\EndWhile
+\State \Return $UB$
+\end{algorithmic}
+\label{alg:benders}
+\end{algorithm}
 
 \subsection{Example}
+
+Here we solve the example shown in Figure \ref{fig:mrcpsp_network} with $R_1=4$ and $\Gamma=2$ to illustrate the implementation of the Benders' decomposition approach which is summarised in Algorithm \ref{alg:benders}. This problem is solved in 6 iterations, and the solution information from the master and subproblem at each of these iterations is shown in Table \ref{table:benders_example}. Note that in the final iteration, the algorithm can terminate after solving the master problem and updating the $UB$ since $LB=UB$, i.e. there is no need to solve the subproblem in the final iteration.
+
+\begin{table}[]
+\centering
+{\renewcommand{\arraystretch}{1.2}  % vertical padding
+\begin{tabular}{llllllll}
+	\hline \hline
+	$t$ & $LB$ & $UB$ & \eta^{*t} & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}^{*t}$}     & \multicolumn{1}{c}{$\pi^{*t}$}  \\
+	\hline
+1         & 11 & 16 & 11          & 16                                  & 1,2,1,1,2 & 0,1,2,5,6 \\
+2         & 12 & 15 & 12          & 15                                  & 1,1,1,1,1 & 0,1,3,2,4,6 \\
+3         & 12 & 15 & 12          & 15                                  & 1,1,1,1,1 & 0,1,2,3,4,6 \\
+4         & 13 & 15 & 13          & 18                                  & 1,2,1,1,1 & 0,1,2,5,6 \\
+5         & 13 & 15 & 13          & 16                                  & 1,1,1,2,1 & 0,1,3,4,2,5,6 \\
+6         & 15 & 15 & 15          & -                                   & 1,1,1,1,1 & - \\
+	\hline \hline
+\end{tabular}
+\caption{Iterations of the Benders' decomposition approach to solve example instance in Figure \ref{fig:mrcpsp_network}.}
+\label{table:benders_example}
+\end{table}
 
 \section{Computational experiments and results}
  
@@ -215,23 +283,23 @@ Table \ref{table:benders_vs_compact} reports the percentage of instances solved 
 {\renewcommand{\arraystretch}{1.2}  % vertical padding
 \begin{tabular}{lrrrrrrrrrrrr}
 		     \hline \hline
-		     &      & & \multicolumn{5}{c}{Benders'}                                       & & \multicolumn{3}{c}{Compact reformulation} \\
+		     &      & & \multicolumn{5}{c}{Benders'}                                       & & \multicolumn{3}{c}{Compact formulation} \\
 		     \cline{4-8} \cline{10-12}
 		     & $\Gamma$ & & \textit{\%sol.} & \textit{gap} & \textit{its.} & \textit{it. time} & \textit{sol. time} & & \textit{\%sol.}   & \textit{gap}   & \textit{sol. time}   \\
 		     \hline
-	\multirow{4}{*}{$j10$} & 0    & & 99.6     & 0.00     & 1            & 73.6          & 100.4        & & 100.00     & 0.00       & 1.8             \\
-			       & 3    & & 75.0     & 5.23     & 48           & 64.1          & 2065.6       & & 100.00     & 0.00       & 5.0             \\
-			       & 5    & & 72.8     & 6.53     & 53           & 67.9          & 2234.5       & & 100.00     & 0.00       & 4.6             \\
-			       & 7    & & 71.8     & 6.75     & 54           & 68.1          & 2278.4       & & 100.00     & 0.00       & 6.5             \\
+	\multirow{4}{*}{$j10$} & 0    & & 100.0    & 0.00     & 1            & 0.96          & 1.1	    & & 100.0      & 0.00       & 1.8             \\
+			       & 3    & & 81.7     & 3.13     & 67           & 3.76          & 1551.4       & & 100.0      & 0.00       & 5.0             \\
+			       & 5    & & 79.7     & 4.20     & 76           & 3.89          & 1688.4       & & 100.0      & 0.00       & 4.6             \\
+			       & 7    & & 79.5     & 4.52     & 78           & 3.98          & 1701.1       & & 100.0      & 0.00       & 6.5             \\
 		     \cline{4-8} \cline{10-12}
-			       &      & & 79.8	   & 4.63     & 39.4	     & 68.4 	     & 1669.7	    & & 100.00     & 0.00	& 4.47 		  \\
+			       &      & & 85.2	   & 2.96     & 56	     & 3.15 	     & 1235.5	    & & 100.0      & 0.00	& 4.47 		  \\
 		     \hline
-	\multirow{4}{*}{$j20$} & 0    & & 80.8     & 0.00     & 1            & 123.5         & 1484.7       & & 89.4       & 1.92       & 941.9           \\
-			       & 5    & & 39.6     & 10.91    & 173          & 124.8         & 5181.7       & & 88.4       & 1.91       & 1061.3          \\
-			       & 10   & & 36.8     & 12.31    & 178          & 126.6         & 5406.2       & & 87.7       & 2.63       & 1138.4          \\
-			       & 15   & & 36.8     & 12.48    & 177          & 135.2         & 5415.8       & & 86.0       & 2.96       & 1279.8          \\
+	\multirow{4}{*}{$j20$} & 0    & & 89.7     & 0.00     & 1            & 176.62        & 901.3        & & 89.4       & 1.92       & 941.9           \\
+			       & 5    & & 51.3     & 10.04    & 228          & 135.66        & 4153.6       & & 88.4       & 1.91       & 1061.3          \\
+			       & 10   & & 50.7     & 10.81    & 228          & 140.37        & 4230.4       & & 87.7       & 2.63       & 1138.4          \\
+			       & 15   & & 49.8     & 11.05    & 222          & 148.72        & 4287.1       & & 86.0       & 2.96       & 1279.8          \\
 		     \cline{4-8} \cline{10-12}
-			       &      & & 48.5	   & 8.93     & 132.5	     & 127.5	     & 4372.1       & & 87.9       & 2.36       & 1105.4          \\
+			       &      & & 60.4	   & 7.98     & 170	     & 150.34	     & 3393.1       & & 87.9       & 2.36       & 1105.4          \\
 		     \hline \hline
 \end{tabular}
 }

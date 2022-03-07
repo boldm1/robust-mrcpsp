@@ -1,5 +1,11 @@
 \begin{thebibliography}{}
 
+\bibitem[Artigues et~al., 2013]{artigues2013robust}
+Artigues, C., Leus, R., and Talla~Nobibon, F. (2013).
+\newblock Robust optimization for resource-constrained project scheduling with
+  uncertain activity durations.
+\newblock {\em Flexible Services and Manufacturing Journal}, 25(1):175--205.
+
 \bibitem[Balouka and Cohen, 2021]{balouka2021robust}
 Balouka, N. and Cohen, I. (2021).
 \newblock A robust optimization approach for the multi-mode
@@ -28,6 +34,12 @@ Bruni, M.~E., Pugliese, L. D.~P., Beraldi, P., and Guerriero, F. (2017).
 \newblock An adjustable robust optimization model for the resource-constrained
   project scheduling problem with uncertain activity durations.
 \newblock {\em Omega}, 71:66--84.
+
+\bibitem[Bruni et~al., 2018]{bruni2018computational}
+Bruni, M.~E., Pugliese, L. D.~P., Beraldi, P., and Guerriero, F. (2018).
+\newblock A computational study of exact approaches for the adjustable robust
+  resource-constrained project scheduling problem.
+\newblock {\em Computers \& Operations Research}, 99:178--190.
 
 \bibitem[Kolisch and Sprecher, 1997]{kolisch1997psplib}
 Kolisch, R. and Sprecher, A. (1997).
