@@ -43,7 +43,7 @@ def get_results(results_dir, solve_methods, Gammas):
                 for line in raw_lines[1:]:
                     splitline = line.split()
                     instance = splitline[0]
-                    if method == 'benders':
+                    if 'benders' in method:
                         file_data[instance] = {'objval': float(splitline[2]), 'objbound': float(splitline[3]),
                                                'gap': float(splitline[4]), 'n_iterations': int(splitline[5]),
                                                'avg_iteration': float(splitline[6]), 'runtime': float(splitline[7])}
@@ -54,7 +54,7 @@ def get_results(results_dir, solve_methods, Gammas):
     return results_data
 
 
-def plot_gaps(results_data, solve_methods, Gammas, save_path):
+def plot_gaps(results_data, solve_methods, Gammas, save_path, legend=True):
     """
     Plots optimality gaps (x-axis) against the proportion of instances solved to within that gap (y-axis) for specified
     solve methods.
@@ -68,6 +68,8 @@ def plot_gaps(results_data, solve_methods, Gammas, save_path):
     :type Gammas: list
     :param save_path: Absolute filepath of directory in which to save plot.
     :type save_path: str
+    :param legend: Indicates whether or not to add legend to plot. Defaults to True.
+    :type legend: bool
     """
     # Check results_data has data for all combinations of solve method and Gamma
     missing_results = []
@@ -104,17 +106,18 @@ def plot_gaps(results_data, solve_methods, Gammas, save_path):
     plt.rc('text', usetex=True)
     plt.figure()
     for method in solve_methods:
-        method_name = method.replace('_', ' ').replace('trans', '').capitalize()  # format method name for legend
-        plt.plot([100 * v for v in gap_values], [100 * v for v in less_than_gap[method]], label=method_name)
+        plt.plot([100 * v for v in gap_values], [100 * v for v in less_than_gap[method]],
+                 color=get_solve_method_line_colour(method), label=get_solve_method_legend_name(method))
     plt.xlim([0, 100 * max_gap])
     plt.ylim([0, 105])
     plt.xlabel(r'Gap (\%)')
     plt.ylabel(r'\% of instances')
-    plt.legend(loc=4, frameon=False)
+    if legend is True:
+        plt.legend(loc=4, frameon=False)
     plt.savefig(os.path.join(save_path, 'gaps.pdf'))
 
 
-def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
+def plot_performance_profile(results_data, solve_methods, Gammas, save_path, legend=True):
     """
     Plots performance profile of solution times for solve methods.
 
@@ -127,6 +130,8 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
     :type Gammas: list
     :param save_path: Absolute filepath of directory in which to save plot.
     :type save_path: str
+    :param legend: Indicates whether or not to add legend to plot. Defaults to True.
+    :type legend: bool
     """
     # Check results_data has data for all combinations of solve method and Gamma
     missing_results = []
@@ -175,20 +180,50 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path):
     plt.rc('text', usetex=True)
     plt.figure()
     for method in solve_methods:
-        method_name = method.replace('_', ' ').replace('trans', '').capitalize()  # format method name for legend
-        plt.plot(taus, perf_profile[method], label=method_name)
+        plt.plot(taus, perf_profile[method], color=get_solve_method_line_colour(method),
+                 label=get_solve_method_legend_name(method))
     plt.xlim([0, max(taus)])
     plt.ylim([0, 1.05])
     plt.xlabel(r'$\tau$')
     plt.ylabel(r'$\mathrm{P}(\log(p_{im})\leq \tau)$')
-    plt.legend(loc=4, frameon=False)
+    if legend is True:
+        plt.legend(loc=4, frameon=False)
     plt.savefig(os.path.join(save_path, 'performance_profile.pdf'))
 
 
+def get_solve_method_line_colour(solve_method):
+    """
+    Returns hexadeximal colour code to use in plots for given solve method.
+    """
+    solve_method_colours = {'compact_reformulation_trans': '#ff7f0e', 'benders': '#a6bddb', 'new_benders': '#2b8cbe'}
+    try:
+        colour = solve_method_colours[solve_method]
+    except KeyError:
+        print(f"{solve_method} is not a solve method (must be either 'compact_reformulation', 'benders' or "
+              f"'new_benders'). Please correct this and try again!")
+        raise
+    return colour
+
+
+def get_solve_method_legend_name(solve_method):
+    """
+    Converts solve method name (as used in the code) into a user-readable solve method name to be printed in legend.
+    """
+    solve_methods = {'compact_reformulation_trans': 'Compact formulation',
+                     'benders': "Balouka \& Cohen (2021) Benders'", 'new_benders': "Alg. 1 Benders'"}
+    try:
+        legend_name = solve_methods[solve_method]
+    except KeyError:
+        print(f"{solve_method} is not a recognised results file solve method (must be either "
+              f"'compact_reformulation', 'benders' or 'new_benders'). Please correct this and try again!")
+        raise
+    return legend_name
+
+
 if __name__ == "__main__":
-    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j20_7200/',
-                          ['benders', 'compact_reformulation_trans'], [5, 10, 15])
-    plot_gaps(results, ['benders', 'compact_reformulation_trans'], [5, 10, 15],
+    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j10_7200/',
+                          ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7])
+    plot_gaps(results, ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7],
               '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
-    plot_performance_profile(results, ['benders', 'compact_reformulation_trans'], [5, 10, 15],
-                             '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
+    plot_performance_profile(results, ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7],
+                             '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/', legend=False)
