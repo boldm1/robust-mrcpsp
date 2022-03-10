@@ -180,12 +180,12 @@ def plot_performance_profile(results_data, solve_methods, Gammas, save_path, leg
     plt.rc('text', usetex=True)
     plt.figure()
     for method in solve_methods:
-        plt.plot(taus, perf_profile[method], color=get_solve_method_line_colour(method),
+        plt.plot(taus, [100 * p for p in perf_profile[method]], color=get_solve_method_line_colour(method),
                  label=get_solve_method_legend_name(method))
     plt.xlim([0, max(taus)])
-    plt.ylim([0, 1.05])
+    plt.ylim([0, 105])
     plt.xlabel(r'$\tau$')
-    plt.ylabel(r'$\mathrm{P}(\log(p_{im})\leq \tau)$')
+    plt.ylabel(r'\% of instances with $\log(r_{ia})\leq \tau$')
     if legend is True:
         plt.legend(loc=4, frameon=False)
     plt.savefig(os.path.join(save_path, 'performance_profile.pdf'))
@@ -221,9 +221,9 @@ def get_solve_method_legend_name(solve_method):
 
 
 if __name__ == "__main__":
-    results = get_results('/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j10_7200/',
-                          ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7])
-    plot_gaps(results, ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7],
-              '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
-    plot_performance_profile(results, ['benders', 'new_benders', 'compact_reformulation_trans'], [3, 5, 7],
-                             '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/', legend=False)
+    results_folder = '/home/boldm1/OneDrive/robust-mrcpsp/code/results/storm_j20_7200/'
+    methods = ['benders', 'new_benders', 'compact_reformulation_trans']
+    Gammas = [5, 10, 15]
+    results = get_results(results_folder, methods, Gammas)
+    plot_gaps(results, methods, Gammas, '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/')
+    plot_performance_profile(results, methods, Gammas, '/home/boldm1/OneDrive/robust-mrcpsp/code/plots/', legend=False)
