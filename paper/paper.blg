@@ -2,45 +2,47 @@ This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: paper.aux
 The style file: apalike.bst
-Database file #1: paper.bib
-You've used 8 entries,
+I found no \bibdata command---while reading file paper.aux
+Warning--I didn't find a database entry for "bold2021compact"
+You've used 0 entries,
             1935 wiz_defined-function locations,
-            525 strings with 5212 characters,
-and the built_in function-call counts, 3358 in all, are:
-= -- 335
-> -- 134
-< -- 4
-+ -- 54
-- -- 44
-* -- 305
-:= -- 581
-add.period$ -- 24
-call.type$ -- 8
-change.case$ -- 62
-chr.to.int$ -- 8
-cite$ -- 8
-duplicate$ -- 112
-empty$ -- 233
-format.name$ -- 60
-if$ -- 640
+            471 strings with 3677 characters,
+and the built_in function-call counts, 17 in all, are:
+= -- 0
+> -- 0
+< -- 0
++ -- 0
+- -- 0
+* -- 0
+:= -- 7
+add.period$ -- 0
+call.type$ -- 0
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 0
+duplicate$ -- 0
+empty$ -- 1
+format.name$ -- 0
+if$ -- 1
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 8
-newline$ -- 43
-num.names$ -- 24
-pop$ -- 42
+missing$ -- 0
+newline$ -- 3
+num.names$ -- 0
+pop$ -- 0
 preamble$ -- 1
-purify$ -- 62
+purify$ -- 0
 quote$ -- 0
-skip$ -- 85
+skip$ -- 1
 stack$ -- 0
-substring$ -- 287
-swap$ -- 8
+substring$ -- 0
+swap$ -- 0
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 48
+type$ -- 0
 warning$ -- 0
-while$ -- 31
+while$ -- 0
 width$ -- 0
-write$ -- 106
+write$ -- 2
+(There was 1 error message)
