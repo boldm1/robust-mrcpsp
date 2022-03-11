@@ -4,7 +4,6 @@ import argparse
 from mrcpsp import load_nominal_mrcpsp
 from benders import Benders
 from compact_reformulation import CompactRefomulation
-from misc_functions import is_valid_directory
 
 
 def create_instances(instance_dir, uncertainty_level):
@@ -105,6 +104,16 @@ def run_experiment(instances, Gamma, solve_method, time_limit):
                 f.write("{}\t{}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\n".format(instance.name, Gamma, compact_sol['objval'],
                                                                           compact_sol['objbound'], gap,
                                                                           compact_sol['runtime']))
+
+
+def is_valid_directory(arg):
+    """
+    Checks directory path given as input argument exists. Throws an error if it does not.
+    """
+    if os.path.isdir(arg):
+        return arg
+    else:
+        raise argparse.ArgumentTypeError("{} is not a valid directory.".format(arg))
 
 
 if __name__ == '__main__':

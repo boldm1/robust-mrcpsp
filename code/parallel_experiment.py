@@ -7,7 +7,6 @@ from functools import partial
 from mrcpsp import load_nominal_mrcpsp
 from benders import Benders
 from compact_reformulation import CompactRefomulation
-from misc_functions import is_valid_directory
 
 
 def create_instances(instance_dir, uncertainty_level):
@@ -172,6 +171,16 @@ def reorder_results(results_file):
         f.write(first_line + '\n')
         for instance in instance_names:
             f.write(data[instance] + '\n')
+
+
+def is_valid_directory(arg):
+    """
+    Checks directory path given as input argument exists. Throws an error if it does not.
+    """
+    if os.path.isdir(arg):
+        return arg
+    else:
+        raise argparse.ArgumentTypeError("{} is not a valid directory.".format(arg))
 
 
 if __name__ == '__main__':
