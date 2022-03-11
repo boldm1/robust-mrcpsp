@@ -281,7 +281,7 @@ The first iteration of the master problem solves the nominal instance, assuming 
 {\renewcommand{\arraystretch}{1.2}  % vertical padding
 \begin{tabular}{llllllll}
 	\hline \hline
-	$t$ & $LB$ & $UB$ & \eta^{*t} & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}^{*t}$}     & \multicolumn{1}{c}{$\pi^{*t}$}  \\
+	$t$ & $LB$ & $UB$ & $\eta^{*t}$ & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}^{*t}$}     & \multicolumn{1}{c}{$\pi^{*t}$}  \\
 	\hline
 1         & 11 & 16 & 11          & 16                                  & 1,2,1,1,2 & 0,1,2,5,6 \\
 2         & 12 & 15 & 12          & 15                                  & 1,1,1,1,1 & 0,1,3,2,4,6 \\
@@ -293,6 +293,7 @@ The first iteration of the master problem solves the nominal instance, assuming 
 \end{tabular}
 \caption{Solution information at each of the six iterations of the Benders' algorithm required to solve example instance in Figure \ref{fig:mrcpsp_network}.}
 \label{table:benders_example}
+}
 \end{table}
 
 \section{Computational experiments and results} \label{section:experiments}
@@ -333,6 +334,7 @@ We begin by observing the effect of the robustness parameter $\Gamma$ on the ave
 	\end{subtable}
 	\caption{Average optimal objective values across instances in the $j10$ and $j20$ instance sets for different values of $\Gamma$.}
 	\label{table:objvals}
+	}
 \end{table}
 
 Table \ref{table:benders_vs_compact} reports the percentage of instances solved to optimality (\textit{\%sol.}), the average percentage optimality gap over instances for which a feasible solution was found (\textit{gap}), and the average solution time in seconds (\textit{sol. time}) for the different choices of $\Gamma$ across the two instance sets, for both the Benders' decomposition approach and the compact formulation. Note that if no optimal solution was found within the time limit by one of the solution methods, the solution time was recorded as the time limit value of 7200 seconds. Additionally, for the Benders' approach, the average number of (completed) iterations (\textit{it.}) and the average time per (completed) iteration (\textit{it. time}) are also reported. The average of the reported values across the different values for $\Gamma$ are also given for each instance set. 
