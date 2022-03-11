@@ -45,6 +45,7 @@
 \newcommand{\X}{{\mathcal{X}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\marc}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
 
@@ -97,10 +98,13 @@ Introduced by \cite{bertsimas2004price}, the motivation of the budgeted uncertai
 
 For a given set of activity modes $\bm{m}$, a forbidden set is defined to be any subset of activities $F_{\bm{m}}\subseteq V$ that are not precedence-related, such that $\sum_{i\in F_{\bm{m}}}r_{im_ik}>R_k$ for at least one resource $k\in K$. That is, a forbidden set is a collection of activities that cannot be executed in parallel only because of resource limitations. Applying the main representation theorem of \cite{bartusch1988scheduling}, for a particular choice of activity modes $\bm{m}$, a solution to the MRCPSP can be defined by a set of additional precedences $X_{\bm{m}}\subseteq V^2\setminus E$ such that the extended precedence network $G(V,E\cup X_{\bm{m}})$ is acyclic and contains no forbidden sets. Such an extension to the project network is referred to as a \textit{sufficient selection}.
 
-The aim of the two-stage robust MRCPSP is therefore to select set of activity modes and a corresponding sufficient selection in order to minimise the worst-case project makespan. For the case where activity durations lie in a budgeted uncertainty set that we consider in this paper, this problem can be written as
+The aim of the two-stage robust MRCPSP is therefore to 
+% select set of 
+\marc{determine}
+activity modes and a corresponding sufficient selection in order to minimise the worst-case project makespan. For the case where activity durations lie in a budgeted uncertainty set that we consider in this paper, this problem can be written as
 \begin{align}
-	& \min_{\bm{m}\in \M,\,X_{\bm{m}}\in \X_{\bm{m}}} \max_{\bm{d}\in\U_{\bm{m}}(\Gamma)} \min S_{n+1}\label{eqn:robust_mrcpsp_1}\\
-	& S_0 = 0\\
+	\min_{\bm{m}\in \M,\,X_{\bm{m}}\in \X_{\bm{m}}} \max_{\bm{d}\in\U_{\bm{m}}(\Gamma)}\ & \min S_{n+1}\label{eqn:robust_mrcpsp_1}\\
+	\text{s.t. } & S_0 = 0\\
 	& S_j - S_i \geq d_{im_i} \qquad \forall (i,j)\in E\cup X_{\bm{m}}\\
 	& S_i \geq 0 \qquad \forall i\in V,\label{eqn:robust_mrcpsp_4}
 \end{align}
@@ -131,7 +135,10 @@ An optimal solution to the instance shown in Figure \ref{fig:mrcpsp_network} is 
 
 We propose solving the robust MRCPSP using an extended version of the mixed-integer programming formulation developed by \cite{bold2021compact} for solving the two-stage adjustable robust RCPSP. This formulation combines the first and second-stage problems into a single compact formulation and was shown to significantly outperform the strongest iterative decomposition-based methods for that problem.
 
-This formulation is constructed by recasting the adversarial subproblem of determining the worst-case activity durations for a given set of mode choices and sufficient selection as a longest path problem on an augmented project network. This augmented project network is formed of $\Gamma+1$ connected copies of the original project network, with each level being used to account for a delay to a single activity in the project. Having reformulated the adversarial subproblem as a longest-path problem, strong duality can be employed to enable its insertion it into a formulation for the first-stage problem, and ultimately arrive at a complete compact formulation for the full problem. Given that the derivation of this formulation is more or less identical to the derivation of the corresponding formulation for the robust RCPSP, we omit it here and instead refer the reader to \cite{bold2021compact}.
+This formulation is constructed by recasting the adversarial subproblem of determining the worst-case activity durations for a given set of mode choices and sufficient selection as a longest path problem on an augmented project network. This 
+% augmented project network 
+\marc{directed acyclic graph}
+is formed of $\Gamma+1$ connected copies of the original project network, with each level being used to account for a delay to a single activity in the project \marc{(a similar construction has been applied in \cite{bendotti2019anchor})}. Having reformulated the adversarial subproblem as a longest-path problem, strong duality can be employed to enable its insertion it into a formulation for the first-stage problem, and ultimately arrive at a complete compact formulation for the full problem. Given that the derivation of this formulation is more or less identical to the derivation of the corresponding formulation for the robust RCPSP, we omit it here and instead refer the reader to \cite{bold2021compact}.
 
 In the resulting compact formulation, $y_{ij}$ variables are used to define a complete set of transitive precedences between the project activities that are formed by the original project precedence constraints and the additional precedences introduced to resolve resource conflicts, i.e. $\{(i,j),\, i,j\in V:y_{ij}=1\}=T(E\cup X_{\bm{m}})$, where $T(\cdot)$ is used to denote the transitive closure of a set. Variables $x_{im}$ determine the processing mode for each activity, whilst resource flow variables $f_{ijk}$ track the amount of renewable resource $k$ that is transferred from activity $i$ to activity $j$ upon its completion. The $S_{i\gamma}$ variables are dual variables associated with the longest-path subproblem, which in this formulation are used to track the start time of activities under the worst-case activity durations. Using these variables, the compact formulation for the robust MRCPSP can be written as   
 \begin{align}
@@ -169,7 +176,7 @@ After initially implementing the Benders' algorithm as it is presented in \cite{
 
 \subsection{The master problem}
 
-The role of the master problem is to determine a choice of activity processing modes $\bm{m}$, as well as a sufficient selection $X_{\bm{m}}$ to resolve any resulting resource conflicts. This problem is solved without the direct consideration of the uncertain activity durations, and instead, uncertainty is accounted for in the subproblem and communicated back to the master problem with the use of optimality cuts. Hence, to remove the uncertainty from the model, (\ref{eqn:compact1})-(\ref{eqn:compact13}) is modified by considering only a single level of the augmented project network. Using this formulation, the master problem can be written as
+The role of the master problem is to determine a choice of activity processing modes $\bm{m}$, as well as a sufficient selection $X_{\bm{m}}$ to resolve any resulting resource conflicts. This problem is solved without the direct consideration of the uncertain activity durations, and instead, uncertainty is accounted for in the subproblem and communicated back to the master problem with the use of optimality cuts. Hence, to remove the uncertainty from the model, (\ref{eqn:compact1})-(\ref{eqn:compact13}) is modified by considering only a single level of the augmented project network. Using this formulation, the master problem \marc{in iteration $t$} can be written as
 \begin{align}
 \min \ & \eta\label{eqn:master_first}\\
 \text{s.t. } & \eta \geq S_{n+1}\\
@@ -258,7 +265,7 @@ An overview of the implementation of the Benders' solution approach outlined in 
 \Initialise{Set $LB=-\infty$, $UB=+\infty$ and $t=1$.}
 \While{$UB > LB$}
 	\State \textbf{Solve master problem (\ref{eqn:master_first})-(\ref{eqn:master_last})} 
-	\State \hspace{\algorithmicindent} Get objective value $\eta^{*t}$, processing modes $\bm{m^{*t}}$ and precedences $\bm{y}_{\bm{m}^{*t}}$
+	\State \hspace{\algorithmicindent} Get objective value $\eta^{*t}$, processing modes $\bm{m}^{*t}$ and precedences $\bm{y}_{\bm{m}^{*t}}$
 	\State \hspace{\algorithmicindent} If $\eta^{*t}>LB$, update $LB\leftarrow \eta^{*t}$ 
 	\State \textbf{Solve subproblem (\ref{eqn:subproblem_first})-(\ref{eqn:subproblem_last})}
 	\State \hspace{\algorithmicindent} Get objective value $V^{*t}$ and longest path $\pi^{*t}$
@@ -281,7 +288,7 @@ The first iteration of the master problem solves the nominal instance, assuming 
 {\renewcommand{\arraystretch}{1.2}  % vertical padding
 \begin{tabular}{llllllll}
 	\hline \hline
-	$t$ & $LB$ & $UB$ & \eta^{*t} & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}^{*t}$}     & \multicolumn{1}{c}{$\pi^{*t}$}  \\
+	$t$ & $LB$ & $UB$ & $\eta^{*t}$ & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}^{*t}$}     & \multicolumn{1}{c}{$\pi^{*t}$}  \\
 	\hline
 1         & 11 & 16 & 11          & 16                                  & 1,2,1,1,2 & 0,1,2,5,6 \\
 2         & 12 & 15 & 12          & 15                                  & 1,1,1,1,1 & 0,1,3,2,4,6 \\
@@ -292,7 +299,7 @@ The first iteration of the master problem solves the nominal instance, assuming 
 	\hline \hline
 \end{tabular}
 \caption{Solution information at each of the six iterations of the Benders' algorithm required to solve example instance in Figure \ref{fig:mrcpsp_network}.}
-\label{table:benders_example}
+\label{table:benders_example}}
 \end{table}
 
 \section{Computational experiments and results} \label{section:experiments}
@@ -332,7 +339,7 @@ We begin by observing the effect of the robustness parameter $\Gamma$ on the ave
 	\label{table:j20_objvals}
 	\end{subtable}
 	\caption{Average optimal objective values across instances in the $j10$ and $j20$ instance sets for different values of $\Gamma$.}
-	\label{table:objvals}
+	\label{table:objvals}}
 \end{table}
 
 Table \ref{table:benders_vs_compact} reports the percentage of instances solved to optimality (\textit{\%sol.}), the average percentage optimality gap over instances for which a feasible solution was found (\textit{gap}), and the average solution time in seconds (\textit{sol. time}) for the different choices of $\Gamma$ across the two instance sets, for both the Benders' decomposition approach and the compact formulation. Note that if no optimal solution was found within the time limit by one of the solution methods, the solution time was recorded as the time limit value of 7200 seconds. Additionally, for the Benders' approach, the average number of (completed) iterations (\textit{it.}) and the average time per (completed) iteration (\textit{it. time}) are also reported. The average of the reported values across the different values for $\Gamma$ are also given for each instance set. 
@@ -374,16 +381,7 @@ Firstly, the results in Table \ref{table:benders_vs_compact} show that for both 
 
 Figures \ref{fig:j10_plots} and \ref{fig:j20_plots} show performance profiles and optimality gap plots for the compact formulation and both implementations of the Benders' decomposition solution approach (Algorithm \ref{alg:benders} and \cite{balouka2021robust}), across the $j10$ and $j20$ sets respectively. Note that only the results for the instances with non-zero values for $\Gamma$ were used to generate these plots, resulting in a total of 1608 $j10$ instances and 1664 $j20$ instances. 
 
-Performance profiles (\cite{dolan2002benchmarking}) provide a visual comparison of competing solution approaches using their \textit{performance ratios}. The performance ratio of algorithm $a\in \mathcal{A}$ for instance $i\in \mathcal{I}$ is defined to be 
-$$r_{ia}=\frac{t_{ia}}{\min_{a\in \mathcal{A}} t_{ia}},$$
-where $t_{ia}$ is the time required to solve instance $i$ using algorithm $a$. If method $a$ is unable to solve an instance $i$ within the 2-hour time limit, then $r_{ia}=R$, where $R\geq \max_{i,\,m}r_{im}$. The performance profiles in Figures \ref{fig:j10_performance_profile} and \ref{fig:j20_performance_profile} show the percentage of instances that have a performance ratio within a factor of $\tau$ of the best algorithm. These are plotted using a log scale for clarity. The y-intercepts of each method give the percentage of instances for which that method found the optimal solution in the fastest time, whereas the right-most value gives the overall percentage of instances that were solved to optimality within the time limit by that method.
-
-These performance profiles show that whenever an instance was able to be solved to optimality by either solution approach, the compact formulation was always the faster method. If we specifically compare the solution times of the compact formulation with the stronger of the two Benders' implementations, across the instances in $j10$ for which both methods found the optimal solution, the average solution time of the compact formulation (1.4s) was almost 200 times faster than for the Benders' approach (283.5s). And when both methods found the optimal solution for instances in the $j20$ set, the average solution time of the compact formulation (13.7s) was almost 100 times faster than for the Benders' approach (1304.5s). 
-
-Figures \ref{fig:j10_gaps} and \ref{fig:j20_gaps} show the percentage of instances solved by each method to within a given optimality gap within the 2-hour time limit. These plots serve as a continuation of the performance profiles beyond just the instances that were solved to optimality. Summarising the data from these plots across both the $j10$ and $j20$ instance sets, the \cite{balouka2021robust} Benders' implementation solves 55.1\% of instances to optimality and finds feasible solutions for a further 35.6\% of instances. Our Benders' implementation solves 65.0\% of instances and finds feasible solution solutions for a further 30.0\% of instances. The compact formulation on the other hand finds a feasible solution to every instance, solving 93.1\% these to optimality.
-
-The results presented here show the clear improvements to the Benders' algorithm afforded by amending the master problem to use the formulation (\ref{eqn:master_first})-(\ref{eqn:master_last}). More significantly however, these results demonstrate the complete dominance of the compact formulation over both Benders' methods.
-\begin{figure}[h]
+\begin{figure}[htb]
 	\makebox[\textwidth][c]{
 	\begin{subfigure}[t]{.6\textwidth}
 		\centering
@@ -401,7 +399,7 @@ The results presented here show the clear improvements to the Benders' algorithm
 	\label{fig:j10_plots}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[htb]
 	\makebox[\textwidth][c]{
 	\begin{subfigure}[t]{.6\textwidth}
 		\centering
@@ -418,6 +416,19 @@ The results presented here show the clear improvements to the Benders' algorithm
 	\caption{Comparison of the Benders' approaches and compact formulation over instances in the $j20$ set.}
 	\label{fig:j20_plots}
 \end{figure}
+
+Performance profiles (\cite{dolan2002benchmarking}) provide a visual comparison of competing solution approaches using their \textit{performance ratios}. The performance ratio of algorithm $a\in \mathcal{A}$ for instance $i\in \mathcal{I}$ is defined to be 
+$$r_{ia}=\frac{t_{ia}}{\min_{a\in \mathcal{A}} t_{ia}},$$
+where $t_{ia}$ is the time required to solve instance $i$ using algorithm $a$. If method $a$ is unable to solve an instance $i$ within the 2-hour time limit, then $r_{ia}=R$, where $R\geq \max_{i,\,m}r_{im}$. The performance profiles in Figures \ref{fig:j10_performance_profile} and \ref{fig:j20_performance_profile} show the percentage of instances that have a performance ratio within a factor of $\tau$ of the best algorithm. These are plotted using a log scale for clarity. The y-intercepts of each method give the percentage of instances for which that method found the optimal solution in the fastest time, whereas the right-most value gives the overall percentage of instances that were solved to optimality within the time limit by that method.
+
+These performance profiles show that whenever an instance was able to be solved to optimality by either solution approach, the compact formulation was always the faster method. If we specifically compare the solution times of the compact formulation with the stronger of the two Benders' implementations, across the instances in $j10$ for which both methods found the optimal solution, the average solution time of the compact formulation (1.4s) was almost 200 times faster than for the Benders' approach (283.5s). 
+% And 
+\marc{When} both methods found the optimal solution for instances in the $j20$ set, the average solution time of the compact formulation (13.7s) was almost 100 times faster than for the Benders' approach (1304.5s). 
+
+Figures \ref{fig:j10_gaps} and \ref{fig:j20_gaps} show the percentage of instances solved by each method to within a given optimality gap within the 2-hour time limit. These plots serve as a continuation of the performance profiles beyond just the instances that were solved to optimality. Summarising the data from these plots across both the $j10$ and $j20$ instance sets, the \cite{balouka2021robust} Benders' implementation solves 55.1\% of instances to optimality and finds feasible solutions for a further 35.6\% of instances. Our Benders' implementation solves 65.0\% of instances and finds feasible solution solutions for a further 30.0\% of instances. The compact formulation on the other hand finds a feasible solution to every instance, solving 93.1\% these to optimality.
+
+The results presented here show the clear improvements to the Benders' algorithm afforded by amending the master problem to use the formulation (\ref{eqn:master_first})-(\ref{eqn:master_last}). More significantly however, these results demonstrate the complete dominance of the compact formulation over both Benders' methods.
+
 
 \section{Conclusions}
 

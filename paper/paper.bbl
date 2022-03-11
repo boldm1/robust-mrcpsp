@@ -18,6 +18,11 @@ Bartusch, M., M{\"o}hring, R.~H., and Radermacher, F.~J. (1988).
   windows.
 \newblock {\em Annals of Operations Research}, 16(1):199--240.
 
+\bibitem[Bendotti et~al., 2019]{bendotti2019anchor}
+Bendotti, P., Chr{\'e}tienne, P., Fouilhoux, P., and Pass-Lanneau, A. (2019).
+\newblock The anchor-robust project scheduling problem.
+\newblock Preprint hal-02144834.
+
 \bibitem[Bertsimas and Sim, 2004]{bertsimas2004price}
 Bertsimas, D. and Sim, M. (2004).
 \newblock The price of robustness.

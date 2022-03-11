@@ -1,46 +1,48 @@
-This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: paper.aux
 The style file: apalike.bst
 Database file #1: paper.bib
-You've used 9 entries,
+Warning--empty journal in bendotti2019anchor
+You've used 10 entries,
             1935 wiz_defined-function locations,
-            532 strings with 5371 characters,
-and the built_in function-call counts, 3762 in all, are:
-= -- 377
-> -- 147
+            537 strings with 5554 characters,
+and the built_in function-call counts, 4136 in all, are:
+= -- 410
+> -- 170
 < -- 5
-+ -- 58
-- -- 48
-* -- 342
-:= -- 649
-add.period$ -- 27
-call.type$ -- 9
-change.case$ -- 69
-chr.to.int$ -- 9
-cite$ -- 9
-duplicate$ -- 126
-empty$ -- 263
-format.name$ -- 67
-if$ -- 719
++ -- 68
+- -- 56
+* -- 374
+:= -- 719
+add.period$ -- 30
+call.type$ -- 10
+change.case$ -- 78
+chr.to.int$ -- 10
+cite$ -- 11
+duplicate$ -- 139
+empty$ -- 283
+format.name$ -- 76
+if$ -- 786
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 9
-newline$ -- 48
-num.names$ -- 27
-pop$ -- 46
+missing$ -- 10
+newline$ -- 53
+num.names$ -- 30
+pop$ -- 56
 preamble$ -- 1
-purify$ -- 69
+purify$ -- 78
 quote$ -- 0
-skip$ -- 96
+skip$ -- 106
 stack$ -- 0
-substring$ -- 324
+substring$ -- 338
 swap$ -- 9
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 54
-warning$ -- 0
-while$ -- 35
+type$ -- 60
+warning$ -- 1
+while$ -- 37
 width$ -- 0
-write$ -- 119
+write$ -- 131
+(There was 1 warning)
