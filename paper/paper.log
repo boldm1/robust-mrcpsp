@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.11.5)  13 MAR 2022 16:57
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2018.11.5)  11 MAR 2022 13:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -404,22 +404,22 @@ Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
 ) (./paper.aux)
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 50.
-LaTeX Font Info:    ... okay on input line 50.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
 \AtBeginShipoutBox=\box32
-Package hyperref Info: Link coloring ON on input line 50.
+Package hyperref Info: Link coloring ON on input line 49.
  (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
  (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
@@ -427,9 +427,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count131
 )
-LaTeX Info: Redefining \ref on input line 50.
-LaTeX Info: Redefining \pageref on input line 50.
-LaTeX Info: Redefining \nameref on input line 50.
+LaTeX Info: Redefining \ref on input line 49.
+LaTeX Info: Redefining \pageref on input line 49.
+LaTeX Info: Redefining \nameref on input line 49.
  (./paper.out) (./paper.out)
 \@outlinefile=\write3
 \openout3 = `paper.out'.
@@ -461,22 +461,22 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for U+msa on input line 62.
+LaTeX Font Info:    Try loading font information for U+msa on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 62.
+LaTeX Font Info:    Try loading font information for U+msb on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 62.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 61.
  (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 62.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 61.
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 62.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 61.
  [1
 
 
@@ -484,93 +484,158 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6> not available
 <figures/mrcpsp_network.pdf, id=92, 364.06609pt x 227.18375pt>
 File: figures/mrcpsp_network.pdf Graphic file (type pdf)
 <use figures/mrcpsp_network.pdf>
-Package pdftex.def Info: figures/mrcpsp_network.pdf  used on input line 90.
+Package pdftex.def Info: figures/mrcpsp_network.pdf  used on input line 89.
 (pdftex.def)             Requested size: 327.65643pt x 204.46346pt.
  [3 <./figures/mrcpsp_network.pdf>]
 <figures/mrcpsp_solution.pdf, id=127, 346.99449pt x 209.99477pt>
 File: figures/mrcpsp_solution.pdf Graphic file (type pdf)
 <use figures/mrcpsp_solution.pdf>
-Package pdftex.def Info: figures/mrcpsp_solution.pdf  used on input line 128.
+Package pdftex.def Info: figures/mrcpsp_solution.pdf  used on input line 124.
 (pdftex.def)             Requested size: 198.67075pt x 120.23337pt.
 <figures/mrcpsp_schedule.pdf, id=128, 485.85048pt x 229.58961pt>
 File: figures/mrcpsp_schedule.pdf Graphic file (type pdf)
 <use figures/mrcpsp_schedule.pdf>
-Package pdftex.def Info: figures/mrcpsp_schedule.pdf  used on input line 128.
+Package pdftex.def Info: figures/mrcpsp_schedule.pdf  used on input line 124.
 (pdftex.def)             Requested size: 250.95587pt x 118.58853pt.
  [4 <./figures/mrcpsp_solution.pdf> <./figures/mrcpsp_schedule.pdf
 
 pdfTeX warning: pdflatex (file ./figures/mrcpsp_schedule.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >] [5] [6] [7]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 263.
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 256.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[8] [9] [10]
-<figures/j10_performance_profile.pdf, id=334, 462.52798pt x 346.89601pt>
+[8]
+./paper.tex:284: Missing $ inserted.
+<inserted text> 
+                $
+l.284 	$t$ & $LB$ & $UB$ & \eta
+                               ^{*t} & $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+./paper.tex:284: Extra }, or forgotten $.
+<template> \unskip \hfil }
+                          \hskip \tabcolsep \endtemplate 
+l.284 	$t$ & $LB$ & $UB$ & \eta^{*t} &
+                                       $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}...
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+./paper.tex:284: Missing $ inserted.
+<inserted text> 
+                $
+l.284 	$t$ & $LB$ & $UB$ & \eta^{*t} &
+                                       $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+./paper.tex:284: Missing } inserted.
+<inserted text> 
+                }
+l.284 	$t$ & $LB$ & $UB$ & \eta^{*t} &
+                                       $V^{*t}$ & \multicolumn{1}{c}{$\bm{m}...
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+./paper.tex:296: Missing } inserted.
+<inserted text> 
+                }
+l.296 \end{table}
+                 
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+[9]
+./paper.tex:336: Missing } inserted.
+<inserted text> 
+                }
+l.336 \end{table}
+                 
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+[10] [11]
+<figures/j10_performance_profile.pdf, id=349, 462.52798pt x 346.89601pt>
 File: figures/j10_performance_profile.pdf Graphic file (type pdf)
 <use figures/j10_performance_profile.pdf>
-Package pdftex.def Info: figures/j10_performance_profile.pdf  used on input line 397.
+Package pdftex.def Info: figures/j10_performance_profile.pdf  used on input line 399.
 (pdftex.def)             Requested size: 263.50443pt x 197.6375pt.
 
-Overfull \hbox (12.54855pt too wide) in paragraph at lines 397--397
+Overfull \hbox (12.54855pt too wide) in paragraph at lines 399--399
  [][] 
  []
 
-<figures/j10_gaps.pdf, id=335, 462.52798pt x 346.89601pt>
+<figures/j10_gaps.pdf, id=350, 462.52798pt x 346.89601pt>
 File: figures/j10_gaps.pdf Graphic file (type pdf)
 <use figures/j10_gaps.pdf>
-Package pdftex.def Info: figures/j10_gaps.pdf  used on input line 397.
+Package pdftex.def Info: figures/j10_gaps.pdf  used on input line 399.
 (pdftex.def)             Requested size: 263.50443pt x 197.6375pt.
 
-Overfull \hbox (12.54855pt too wide) in paragraph at lines 397--397
+Overfull \hbox (12.54855pt too wide) in paragraph at lines 399--399
  [][] 
  []
 
-<figures/j20_performance_profile.pdf, id=336, 462.52798pt x 346.89601pt>
+<figures/j20_performance_profile.pdf, id=351, 462.52798pt x 346.89601pt>
 File: figures/j20_performance_profile.pdf Graphic file (type pdf)
 <use figures/j20_performance_profile.pdf>
-Package pdftex.def Info: figures/j20_performance_profile.pdf  used on input line 415.
+Package pdftex.def Info: figures/j20_performance_profile.pdf  used on input line 417.
 (pdftex.def)             Requested size: 263.50443pt x 197.6375pt.
 
-Overfull \hbox (12.54855pt too wide) in paragraph at lines 415--415
+Overfull \hbox (12.54855pt too wide) in paragraph at lines 417--417
  [][] 
  []
 
-<figures/j20_gaps.pdf, id=337, 462.52798pt x 346.89601pt>
+<figures/j20_gaps.pdf, id=352, 462.52798pt x 346.89601pt>
 File: figures/j20_gaps.pdf Graphic file (type pdf)
 <use figures/j20_gaps.pdf>
-Package pdftex.def Info: figures/j20_gaps.pdf  used on input line 415.
+Package pdftex.def Info: figures/j20_gaps.pdf  used on input line 417.
 (pdftex.def)             Requested size: 263.50443pt x 197.6375pt.
 
-Overfull \hbox (12.54855pt too wide) in paragraph at lines 415--415
+Overfull \hbox (12.54855pt too wide) in paragraph at lines 417--417
  [][] 
  []
 
-[11] [12 <./figures/j10_performance_profile.pdf> <./figures/j10_gaps.pdf>] (./paper.bbl [13 <./figures/j20_performance_profile.pdf> <./figures/j20_gaps.pdf>])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 447.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[12 <./figures/j10_performance_profile.pdf> <./figures/j10_gaps.pdf>] (./paper.bbl [13 <./figures/j20_performance_profile.pdf> <./figures/j20_gaps.pdf>])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 436.
  [14]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 447.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 436.
  (./paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 447.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 447.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 436.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 436.
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: 33DD3832260A3698CC9EADF86C26D447;594.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 447.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 436.
  ) 
 Here is how much of TeX's memory you used:
- 11421 strings out of 492982
- 180681 string characters out of 6134896
- 374199 words of memory out of 5000000
- 14744 multiletter control sequences out of 15000+600000
+ 11416 strings out of 492982
+ 180576 string characters out of 6134896
+ 373151 words of memory out of 5000000
+ 14740 multiletter control sequences out of 15000+600000
  23385 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  42i,12n,51p,8816b,539s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (14 pages, 382560 bytes).
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmbsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on paper.pdf (14 pages, 384807 bytes).
 PDF statistics:
- 499 PDF objects out of 1000 (max. 8388607)
+ 500 PDF objects out of 1000 (max. 8388607)
  408 compressed objects within 5 object streams
- 83 named destinations out of 1000 (max. 500000)
+ 82 named destinations out of 1000 (max. 500000)
  116 words of extra memory for PDF output out of 10000 (max. 10000000)
 
